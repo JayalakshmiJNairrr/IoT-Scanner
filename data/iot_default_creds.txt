@@ -1,0 +1,65 @@
+# IoT Default Credentials — Curated list for security research simulation
+# Sources:
+#   - Mirai botnet source code (public, 2016): https://github.com/jgamblin/Mirai-Source-Code
+#   - OWASP/SecLists default-passwords: https://github.com/danielmiessler/SecLists
+#   - Common IoT manufacturer defaults (publicly documented)
+#
+# Format: username,password
+# This file is for EDUCATIONAL SIMULATION ONLY — all scanning is localhost only.
+# These credentials are publicly documented in security research papers and IoT CVEs.
+
+# ─── TOP5 ── Highest priority (most commonly found in real breaches) ──────────
+admin,admin
+root,root
+admin,password
+admin,1234
+root,password
+
+# ─── TOP20 ── Well-known manufacturer/device defaults ────────────────────────
+admin,12345
+user,user
+root,12345
+guest,guest
+setup,setup
+admin,ipcam
+admin,123456
+root,admin
+admin,
+root,
+service,service
+ubnt,ubnt
+pi,raspberry
+admin,admin123
+
+# ─── EXTENDED ── Device-specific and less common defaults ─────────────────────
+admin,admin1234
+admin,pass
+root,pass
+admin,system
+root,system
+admin,default
+root,default
+root,1234
+admin,support
+root,support
+admin,login
+admin,abc123
+root,abc123
+root,root123
+root,rootpass
+admin,manager
+admin,device
+support,support
+operator,operator
+admin,operator
+root,operator
+tecnicolor,tecnicolor
+admin,motorola
+admin,admin01
+root,alpine
+admin,smcadmin
+admin,sensor123
+admin,plug123
+admin,camera1
+root,camera1
+admin,wireless

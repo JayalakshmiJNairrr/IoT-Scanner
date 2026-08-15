@@ -1,0 +1,98 @@
+[
+  {
+    "device_id": "TempSensor-01",
+    "device_type": "sensor",
+    "port": 9010,
+    "hardened": false,
+    "simulated_ip": "fd00::201",
+    "service": "CoAP/5683",
+    "display_name": "TempSensor-01",
+    "type_label": "Sensor · Temperature",
+    "description": "Contiki-NG Temperature Sensor — Default Credentials (admin/admin1234)",
+    "valid_credentials": [{"username": "admin", "password": "admin1234"}]
+  },
+  {
+    "device_id": "TempSensor-02",
+    "device_type": "sensor",
+    "port": 9011,
+    "hardened": true,
+    "simulated_ip": "fd00::202",
+    "service": "CoAP/5683",
+    "display_name": "TempSensor-02",
+    "type_label": "Sensor · Temperature",
+    "description": "Contiki-NG Temperature Sensor — Account Lockout (5 fails / 60s)",
+    "valid_credentials": [{"username": "admin", "password": "sensor123"}]
+  },
+  {
+    "device_id": "SmartCamera-03",
+    "device_type": "camera",
+    "port": 9001,
+    "hardened": false,
+    "simulated_ip": "fd00::203",
+    "service": "CoAP/5683",
+    "display_name": "SmartCamera-03",
+    "type_label": "Camera · IP Security",
+    "description": "Smart IP Camera (IPCam-2000 HD) — Default Credentials (admin/admin)",
+    "valid_credentials": [{"username": "admin", "password": "admin"}]
+  },
+  {
+    "device_id": "SmartCamera-04",
+    "device_type": "camera",
+    "port": 9002,
+    "hardened": true,
+    "simulated_ip": "fd00::204",
+    "service": "CoAP/5683",
+    "display_name": "SmartCamera-04",
+    "type_label": "Camera · IP Security",
+    "description": "Smart IP Camera (IPCam-2000 HD) — Account Lockout + Hardened",
+    "valid_credentials": [{"username": "admin", "password": "ipcam"}]
+  },
+  {
+    "device_id": "BorderRouter-05",
+    "device_type": "router",
+    "port": 9020,
+    "hardened": false,
+    "simulated_ip": "fd00::205",
+    "service": "CoAP/5683",
+    "display_name": "BorderRouter-05",
+    "type_label": "Router · Border Gateway",
+    "description": "Contiki-NG 6LoWPAN Border Router — Default Credentials (root/root)",
+    "valid_credentials": [{"username": "root", "password": "root"}]
+  },
+  {
+    "device_id": "BorderRouter-06",
+    "device_type": "router",
+    "port": 9021,
+    "hardened": true,
+    "simulated_ip": "fd00::206",
+    "service": "CoAP/5683",
+    "display_name": "BorderRouter-06",
+    "type_label": "Router · Border Gateway",
+    "description": "Contiki-NG 6LoWPAN Border Router — SSH-only + Hardened",
+    "valid_credentials": [{"username": "support", "password": "support"}]
+  },
+  {
+    "device_id": "SmartPlug-07",
+    "device_type": "smartplug",
+    "port": 9030,
+    "hardened": false,
+    "simulated_ip": "fd00::207",
+    "service": "CoAP/5683",
+    "display_name": "SmartPlug-07",
+    "type_label": "SmartPlug · Power Control",
+    "description": "Smart Power Plug — Default Credentials (admin/password)",
+    "valid_credentials": [{"username": "admin", "password": "password"}]
+  },
+  {
+    "device_id": "SmartPlug-08",
+    "device_type": "smartplug",
+    "port": 9031,
+    "hardened": true,
+    "simulated_ip": "fd00::208",
+    "service": "CoAP/5683",
+    "display_name": "SmartPlug-08",
+    "type_label": "SmartPlug · Power Control",
+    "description": "Smart Power Plug — Token-based auth + Hardened",
+    "valid_credentials": [{"username": "admin", "password": "plug123"}]
+  }
+]
