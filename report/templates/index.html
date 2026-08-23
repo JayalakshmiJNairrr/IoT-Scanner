@@ -3,80 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRYMESH — IoT Security Scanner</title>
-    <meta name="description" content="SENTRYMESH: Real-time IoT default credential scanner and security audit dashboard for Contiki-NG networks.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>SENTRYMESH — Enterprise IoT Security Audit Platform</title>
+    <meta name="description" content="SENTRYMESH: Enterprise IoT Default Credential Scanner & Security Audit Dashboard for Contiki-NG 6LoWPAN Networks.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ── Design System ────────────────────────────────────────────────────────── */
+/* ── SENTRYMESH Enterprise Design System ─────────────────────────────────── */
 :root {
-    --bg:         #050810;
-    --bg2:        #0a0f1e;
-    --panel:      rgba(14, 20, 38, 0.85);
-    --card:       #0d1526;
-    --border:     #1a2540;
-    --border2:    #243055;
-    --text:       #e8edf8;
-    --muted:      #6b7fa3;
-    --dim:        #3a4a6b;
-    --primary:    #4f8ef7;
-    --primary-g:  rgba(79, 142, 247, 0.18);
-    --violet:     #7c3aed;
-    --cyan:       #06b6d4;
-    --green:      #10b981;
-    --red:        #f43f5e;
-    --amber:      #f59e0b;
-    --font:       'Outfit', sans-serif;
-    --mono:       'Fira Code', monospace;
-}
-
-/* ── Modal Backdrop & Pop-up ───────────────────────────────────────────────── */
-.modal-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(2, 4, 10, 0.85);
-    backdrop-filter: blur(12px);
-    z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    animation: modalFadeIn 0.25s ease;
-}
-@keyframes modalFadeIn { from{opacity:0; transform:scale(0.96)} to{opacity:1; transform:scale(1)} }
-.modal-content {
-    background: var(--panel);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    width: 100%; max-width: 680px;
-    max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(79,142,247,0.2);
-    padding: 28px;
-    display: flex; flex-direction: column; gap: 20px;
-    position: relative;
-}
-.modal-close {
-    position: absolute; top: 20px; right: 20px;
-    background: rgba(255,255,255,0.06); border: 1px solid var(--border2);
-    color: var(--muted); width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 1.1rem; transition: all 0.2s;
-}
-.modal-close:hover { color: var(--text); background: rgba(255,255,255,0.12); }
-
-/* RTSP / Telemetry viewport inside modal */
-.device-viewport-box {
-    background: #000;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    height: 180px;
-    position: relative;
-    overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 14px;
-}
-.scanlines-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-    background-size: 100% 4px; pointer-events: none; opacity: 0.6;
+    --bg-base:        #060913;
+    --bg-surface:     #0a0f1d;
+    --bg-panel:       rgba(13, 21, 38, 0.75);
+    --bg-card:        #0d172a;
+    --bg-card-hover:  #121f38;
+    --border-subtle:  #1b2a47;
+    --border-bright:  #2d4268;
+    --border-accent:  #3b82f6;
+    
+    --text-main:      #f1f5f9;
+    --text-muted:     #94a3b8;
+    --text-dim:       #475569;
+    
+    --primary:        #38bdf8;
+    --primary-glow:   rgba(56, 189, 248, 0.25);
+    --primary-dark:   #0284c7;
+    
+    --accent-violet:  #818cf8;
+    --accent-cyan:    #06b6d4;
+    
+    --status-safe:    #10b981;
+    --status-safe-g:  rgba(16, 185, 129, 0.18);
+    --status-vuln:    #f43f5e;
+    --status-vuln-g:  rgba(244, 63, 94, 0.18);
+    --status-warn:    #f59e0b;
+    --status-warn-g:  rgba(245, 158, 11, 0.18);
+    
+    --font-heading:   'Outfit', sans-serif;
+    --font-body:      'Inter', sans-serif;
+    --font-mono:      'JetBrains Mono', monospace;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -84,637 +50,549 @@
 html { scroll-behavior: smooth; }
 
 body {
-    font-family: var(--font);
-    background: var(--bg);
+    font-family: var(--font-body);
+    background: var(--bg-base);
     background-image:
-        radial-gradient(ellipse at 15% 20%, rgba(79, 142, 247, 0.08) 0, transparent 55%),
-        radial-gradient(ellipse at 85% 80%, rgba(124, 58, 237, 0.07) 0, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.05) 0, transparent 45%);
-    color: var(--text);
+        radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.08) 0, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(129, 140, 248, 0.07) 0, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0, transparent 60%);
+    color: var(--text-main);
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* ── Grid Lines Overlay ───────────────────────────────────────────────────── */
+/* ── Grid Overlay ─────────────────────────────────────────────────────────── */
 body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
-        linear-gradient(rgba(79,142,247,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(79,142,247,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
+        linear-gradient(rgba(56, 189, 248, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
 }
 
-/* ── Layout ───────────────────────────────────────────────────────────────── */
 .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
-/* ── Top Navigation Bar ───────────────────────────────────────────────────── */
+/* ── Enterprise Top Bar ───────────────────────────────────────────────────── */
 .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 28px;
-    background: rgba(5, 8, 16, 0.92);
+    padding: 14px 32px;
+    background: rgba(6, 9, 19, 0.92);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-subtle);
     position: sticky; top: 0; z-index: 100;
 }
 
 .brand { display: flex; align-items: center; gap: 14px; }
-.brand-icon {
-    width: 42px; height: 42px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--violet) 100%);
-    border-radius: 10px;
+.brand-shield {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 0 24px rgba(79,142,247,0.4);
-    animation: iconPulse 4s ease-in-out infinite;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
-@keyframes iconPulse {
-    0%,100% { box-shadow: 0 0 24px rgba(79,142,247,0.4); }
-    50%      { box-shadow: 0 0 40px rgba(79,142,247,0.7), 0 0 60px rgba(124,58,237,0.3); }
+.brand-name {
+    font-family: var(--font-heading);
+    font-size: 1.45rem; font-weight: 900; letter-spacing: 0.05em;
+    background: linear-gradient(to right, #ffffff, #cbd5e1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.brand-name { font-size: 1.4rem; font-weight: 900; letter-spacing: 0.06em;
-    background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.brand-sub  { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px; }
+.brand-sub {
+    font-size: 0.72rem; font-weight: 600; color: var(--primary);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px;
+}
 
-/* Tabs */
-.nav-tabs { display: flex; gap: 4px; }
+/* Nav Tabs */
+.nav-tabs {
+    display: flex; gap: 6px;
+    background: rgba(13, 23, 42, 0.8);
+    padding: 4px; border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+}
 .nav-tab {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--muted);
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-family: var(--font); font-weight: 600; font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex; align-items: center; gap: 7px;
+    background: transparent; border: none;
+    color: var(--text-muted);
+    padding: 9px 20px; border-radius: 8px;
+    font-family: var(--font-heading); font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 8px;
 }
-.nav-tab:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.04); }
+.nav-tab:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
 .nav-tab.active {
-    color: var(--primary);
-    border-color: rgba(79,142,247,0.4);
-    background: rgba(79,142,247,0.1);
+    color: #ffffff;
+    background: linear-gradient(135deg, #0284c7, #4f46e5);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
 }
-.nav-tab .tab-badge {
-    background: var(--red);
-    color: white; font-size: 0.65rem; padding: 1px 6px; border-radius: 99px;
-    font-weight: 700;
+.tab-badge {
+    background: var(--status-vuln); color: white;
+    font-size: 0.65rem; padding: 1px 6px; border-radius: 99px; font-weight: 800;
     display: none;
 }
-.nav-tab .tab-badge.show { display: inline; }
+.tab-badge.show { display: inline; }
 
 /* Status Pill */
+.status-bar-right { display: flex; align-items: center; gap: 14px; }
+
 .status-pill {
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 99px; padding: 6px 14px;
-    font-size: 0.8rem; color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(13, 23, 42, 0.9);
+    border: 1px solid var(--border-subtle);
+    border-radius: 99px; padding: 7px 16px;
+    font-size: 0.8rem; font-weight: 500; color: var(--text-muted);
 }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); }
-.dot.online  { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
-.dot.offline { background: var(--dim); }
-.dot.scanning { background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: blink 0.5s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); }
+.dot.online   { background: var(--status-safe); box-shadow: 0 0 10px var(--status-safe); animation: pulseDot 2s infinite; }
+.dot.offline  { background: var(--text-dim); }
+.dot.scanning { background: var(--status-warn); box-shadow: 0 0 10px var(--status-warn); animation: pulseDot 0.6s infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* ── Tab Content ──────────────────────────────────────────────────────────── */
-.tab-content { display: none; flex: 1; padding: 28px; animation: fadeIn 0.3s ease; }
+/* ── Content Container ────────────────────────────────────────────────────── */
+.tab-content { display: none; flex: 1; padding: 32px; animation: fadeIn 0.3s ease; }
 .tab-content.active { display: block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
 
-/* ── Panel / Card ─────────────────────────────────────────────────────────── */
+/* ── Enterprise Panels & Cards ────────────────────────────────────────────── */
 .panel {
-    background: var(--panel);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
+    background: var(--bg-panel);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
-.panel-sm { padding: 16px 20px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.panel-sm { padding: 18px 22px; }
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px; padding: 20px;
+    transition: all 0.2s ease;
+}
+.card:hover { border-color: var(--border-bright); }
 .panel-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 16px; margin-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px; margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-subtle);
 }
-.panel-title { font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-.panel-title .icon { font-size: 1rem; }
+.panel-title {
+    font-family: var(--font-heading);
+    font-size: 1rem; font-weight: 700; letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 10px;
+}
+.panel-title .icon { font-size: 1.1rem; }
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 .btn {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 20px; border-radius: 10px;
-    font-family: var(--font); font-weight: 700; font-size: 0.875rem;
+    padding: 10px 22px; border-radius: 10px;
+    font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem;
     border: none; cursor: pointer; transition: all 0.2s ease;
-    white-space: nowrap;
+    white-space: nowrap; text-decoration: none;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: linear-gradient(135deg, var(--primary), var(--violet)); color: #fff; box-shadow: 0 4px 16px rgba(79,142,247,0.3); }
-.btn-primary:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,142,247,0.5); }
-.btn-green { background: linear-gradient(135deg, var(--green), #059669); color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
-.btn-green:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,185,129,0.5); }
-.btn-red { background: linear-gradient(135deg, var(--red), #e11d48); color: #fff; box-shadow: 0 4px 14px rgba(244,63,94,0.3); }
-.btn-red:not(:disabled):hover { transform: translateY(-2px); }
-.btn-ghost { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border2); }
-.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text); }
-.btn-sm { padding: 7px 14px; font-size: 0.8rem; border-radius: 8px; }
-.btn-full { width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; }
+.btn-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+    color: #ffffff; box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+}
+.btn-primary:not(:disabled):hover {
+    transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2, 132, 199, 0.55);
+}
+.btn-green {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    color: #ffffff; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+.btn-green:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5); }
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.05); color: var(--text-muted);
+    border: 1px solid var(--border-bright);
+}
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+.btn-sm { padding: 7px 16px; font-size: 0.8rem; border-radius: 8px; }
+.btn-full { width: 100%; justify-content: center; padding: 13px; font-size: 0.92rem; }
 
-/* Toggle Switch */
+/* ── Toggle Switch ────────────────────────────────────────────────────────── */
 .toggle-wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+.switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider-track {
-    position: absolute; inset: 0; background: #1e293b; border-radius: 26px;
-    cursor: pointer; transition: 0.3s;
+    position: absolute; inset: 0; background: #1e293b; border-radius: 28px;
+    cursor: pointer; transition: 0.3s; border: 1px solid var(--border-subtle);
 }
 .slider-track::before {
     content: ''; position: absolute;
     width: 20px; height: 20px; left: 3px; bottom: 3px;
-    background: white; border-radius: 50%; transition: 0.3s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    background: #ffffff; border-radius: 50%; transition: 0.3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
-input:checked + .slider-track { background: var(--green); }
+input:checked + .slider-track { background: var(--status-safe); border-color: var(--status-safe); }
 input:checked + .slider-track::before { transform: translateX(24px); }
 
-/* Input */
+/* Inputs */
 .input {
-    width: 100%; background: rgba(5,8,16,0.8); border: 1px solid var(--border2);
-    color: var(--text); padding: 11px 14px; border-radius: 9px;
-    font-family: var(--mono); font-size: 0.875rem; transition: border-color 0.2s;
+    width: 100%; background: rgba(6, 9, 19, 0.9);
+    border: 1px solid var(--border-bright);
+    color: var(--text-main); padding: 11px 16px; border-radius: 10px;
+    font-family: var(--font-mono); font-size: 0.85rem; transition: border-color 0.2s;
 }
-.input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,142,247,0.12); }
+.input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 
-/* ── TAB 1: CONNECT ───────────────────────────────────────────────────────── */
+/* ── TAB 1: CONNECT & TOPOLOGY ────────────────────────────────────────────── */
 .connect-grid {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 400px; gap: 28px;
+    max-width: 1440px; margin: 0 auto;
 }
 @media (max-width: 1100px) { .connect-grid { grid-template-columns: 1fr; } }
 
-/* Radar Network Map */
 .radar-container {
-    position: relative;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
-    min-height: 520px;
+    position: relative; background: var(--bg-panel);
+    border: 1px solid var(--border-subtle); border-radius: 20px;
+    padding: 28px; min-height: 540px;
     display: flex; flex-direction: column; gap: 20px;
 }
 .radar-svg-wrap {
-    flex: 1;
-    display: flex; align-items: center; justify-content: center;
+    flex: 1; display: flex; align-items: center; justify-content: center;
     position: relative;
 }
-#connect-radar-svg, #scan-radar-svg {
-    width: 100%; max-width: 480px; height: auto;
-}
-
-/* Info panel right side */
-.connect-info { display: flex; flex-direction: column; gap: 18px; }
+#connect-radar-svg, #scan-radar-svg { width: 100%; max-width: 480px; height: auto; }
 
 .iface-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px;
-    background: rgba(79,142,247,0.06);
-    border: 1px solid rgba(79,142,247,0.2);
-    border-radius: 10px;
+    padding: 12px 18px; background: rgba(56, 189, 248, 0.06);
+    border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 10px;
     font-size: 0.85rem;
 }
-.iface-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 3px; font-weight: 600; }
-.iface-value { font-family: var(--mono); font-size: 0.85rem; }
+.iface-label { color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; }
+.iface-value { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--primary); }
 
 .device-discovery-list { display: flex; flex-direction: column; gap: 8px; }
 .device-disc-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; font-size: 0.82rem;
-    transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; background: var(--bg-card);
+    border: 1px solid var(--border-subtle); border-radius: 10px;
+    font-size: 0.82rem; transition: all 0.2s ease;
 }
-.device-disc-item.online { border-color: rgba(16,185,129,0.3); }
-.device-disc-item .disc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
-.device-disc-item.online .disc-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
-.device-disc-item .disc-name { font-weight: 600; flex: 1; }
-.device-disc-item .disc-ip { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
-.device-disc-item .disc-type { font-size: 0.7rem; color: var(--dim); }
+.device-disc-item:hover { border-color: var(--primary); background: var(--bg-card-hover); }
+.device-disc-item.online { border-color: rgba(16, 185, 129, 0.35); }
+.device-disc-item .disc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
+.device-disc-item.online .disc-dot { background: var(--status-safe); box-shadow: 0 0 8px var(--status-safe); }
+.device-disc-item .disc-name { font-weight: 700; flex: 1; }
+.device-disc-item .disc-ip { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
+.device-disc-item .disc-type { font-size: 0.72rem; color: var(--text-dim); }
 
-/* Scan config panel */
-.scan-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media (max-width: 600px) { .scan-config-grid { grid-template-columns: 1fr; } }
-.config-field { display: flex; flex-direction: column; gap: 5px; }
-.config-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.scan-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.config-field { display: flex; flex-direction: column; gap: 6px; }
+.config-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
-/* ── TAB 2: LIVE SCAN ─────────────────────────────────────────────────────── */
+/* ── TAB 2: LIVE AUDIT TERMINAL ───────────────────────────────────────────── */
 .scan-grid {
-    display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 24px;
-    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 440px; gap: 28px;
+    max-width: 1440px; margin: 0 auto;
 }
 @media (max-width: 1100px) { .scan-grid { grid-template-columns: 1fr; } }
 
-.scan-left { display: flex; flex-direction: column; gap: 18px; }
-.scan-right { display: flex; flex-direction: column; gap: 18px; }
-
-/* Progress counters */
-.scan-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.scan-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .scan-stat-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; text-align: center;
+    background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;
+    padding: 18px; text-align: center;
 }
-.scan-stat-num { font-size: 2rem; font-weight: 800; font-family: var(--mono); }
-.scan-stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-.scan-stat-num.cracked { color: var(--red); }
-.scan-stat-num.safe    { color: var(--green); }
+.scan-stat-num { font-size: 2.2rem; font-weight: 900; font-family: var(--font-mono); }
+.scan-stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+.scan-stat-num.cracked { color: var(--status-vuln); }
+.scan-stat-num.safe    { color: var(--status-safe); }
 .scan-stat-num.total   { color: var(--primary); }
 
-/* Live Terminal */
 .terminal {
-    background: #02040a;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    flex: 1;
+    background: #02050c; border: 1px solid var(--border-bright);
+    border-radius: 16px; overflow: hidden;
     display: flex; flex-direction: column;
 }
 .terminal-header {
-    background: #0a0f1a;
-    padding: 10px 16px;
+    background: #0a0f1d; padding: 12px 18px;
     display: flex; align-items: center; gap: 10px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-subtle);
 }
 .terminal-dots { display: flex; gap: 6px; }
 .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-.terminal-dot.red    { background: #ff5f57; }
-.terminal-dot.amber  { background: #febc2e; }
-.terminal-dot.green  { background: #28c840; }
-.terminal-title { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); margin-left: 6px; }
+.terminal-dot.red    { background: #ef4444; }
+.terminal-dot.amber  { background: #f59e0b; }
+.terminal-dot.green  { background: #10b981; }
+.terminal-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-left: 6px; }
 .terminal-body {
-    padding: 14px 16px;
-    flex: 1;
-    font-family: var(--mono); font-size: 0.78rem; line-height: 1.6;
-    overflow-y: auto; min-height: 300px; max-height: 400px;
-    color: #94a3b8;
+    padding: 16px 18px; flex: 1;
+    font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65;
+    overflow-y: auto; min-height: 320px; max-height: 440px; color: #cbd5e1;
 }
-.terminal-body::-webkit-scrollbar { width: 4px; }
-.terminal-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.log-line { white-space: pre-wrap; word-break: break-all; }
-.log-ok    { color: #10b981; }
-.log-fail  { color: #64748b; }
-.log-crack { color: #f43f5e; font-weight: 600; }
-.log-lock  { color: #f59e0b; }
-.log-info  { color: #6366f1; }
-.log-head  { color: #06b6d4; }
+.terminal-body::-webkit-scrollbar { width: 6px; }
+.terminal-body::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 6px; }
 
-/* Device node progress list */
+.log-line { white-space: pre-wrap; word-break: break-all; }
+.log-ok    { color: #34d399; }
+.log-fail  { color: #64748b; }
+.log-crack { color: #f43f5e; font-weight: 700; }
+.log-lock  { color: #fbbf24; }
+.log-info  { color: #818cf8; }
+.log-head  { color: #38bdf8; font-weight: 700; }
+
 .node-progress-list { display: flex; flex-direction: column; gap: 8px; }
 .node-progress-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px;
-    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    font-size: 0.82rem; transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; background: var(--bg-card);
+    border: 1px solid var(--border-subtle); border-radius: 10px;
+    font-size: 0.82rem; transition: all 0.2s ease;
 }
-.node-progress-item.scanning  { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
-.node-progress-item.cracked   { border-color: rgba(244,63,94,0.4);  background: rgba(244,63,94,0.05); }
-.node-progress-item.safe      { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.05); }
-.node-progress-item .np-icon  { font-size: 1rem; flex-shrink: 0; }
-.node-progress-item .np-name  { font-weight: 600; flex: 1; }
+.node-progress-item.scanning { border-color: rgba(245, 158, 11, 0.4); background: var(--status-warn-g); }
+.node-progress-item.cracked  { border-color: rgba(244, 63, 94, 0.4);  background: var(--status-vuln-g); }
+.node-progress-item.safe     { border-color: rgba(16, 185, 129, 0.4); background: var(--status-safe-g); }
+.np-name { font-weight: 700; flex: 1; }
 .np-badge {
-    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 99px; letter-spacing: 0.05em;
+    font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 99px; letter-spacing: 0.05em;
 }
-.np-badge.pending  { background: rgba(107,127,163,0.2); color: var(--muted); }
-.np-badge.scanning { background: rgba(245,158,11,0.2); color: var(--amber); }
-.np-badge.cracked  { background: rgba(244,63,94,0.2);  color: var(--red); }
-.np-badge.safe     { background: rgba(16,185,129,0.2); color: var(--green); }
+.np-badge.pending  { background: rgba(71, 85, 105, 0.3); color: var(--text-muted); }
+.np-badge.scanning { background: rgba(245, 158, 11, 0.25); color: var(--status-warn); }
+.np-badge.cracked  { background: rgba(244, 63, 94, 0.25);  color: var(--status-vuln); }
+.np-badge.safe     { background: rgba(16, 185, 129, 0.25); color: var(--status-safe); }
 
-/* ── TAB 3: RESULTS ───────────────────────────────────────────────────────── */
-.results-grid { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+/* ── TAB 3: RESULTS & METRICS ─────────────────────────────────────────────── */
+.results-grid { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-/* Stat cards row */
-.stat-cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.stat-cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 @media (max-width: 900px) { .stat-cards-row { grid-template-columns: repeat(2,1fr); } }
 
 .stat-card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-    padding: 20px 22px; position: relative; overflow: hidden;
+    background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 16px;
+    padding: 22px 24px; position: relative; overflow: hidden;
 }
-.stat-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-}
-.stat-card.blue::before  { background: linear-gradient(to right, var(--primary), var(--cyan)); }
-.stat-card.red::before   { background: linear-gradient(to right, var(--red), #fb923c); }
-.stat-card.green::before { background: linear-gradient(to right, var(--green), #34d399); }
-.stat-card.amber::before { background: linear-gradient(to right, var(--amber), #fcd34d); }
-.stat-num { font-size: 2.4rem; font-weight: 900; font-family: var(--mono); line-height: 1; }
-.stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; margin-top: 6px; font-weight: 600; }
-.stat-icon { position: absolute; right: 18px; top: 18px; font-size: 1.6rem; opacity: 0.25; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.stat-card.blue::before  { background: linear-gradient(to right, #38bdf8, #818cf8); }
+.stat-card.red::before   { background: linear-gradient(to right, #f43f5e, #fb923c); }
+.stat-card.green::before { background: linear-gradient(to right, #10b981, #34d399); }
+.stat-card.amber::before { background: linear-gradient(to right, #f59e0b, #fbbf24); }
 
-/* Run history selector */
+.stat-num { font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); line-height: 1; }
+.stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 8px; letter-spacing: 0.05em; }
+
 .run-history-bar {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 18px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+    background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 14px;
     flex-wrap: wrap;
 }
 .run-chip {
-    padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 600;
-    border: 1px solid var(--border2); cursor: pointer; transition: all 0.2s;
-    background: var(--card);
-    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 99px; font-size: 0.8rem; font-weight: 600;
+    border: 1px solid var(--border-bright); cursor: pointer; transition: all 0.2s;
+    background: var(--bg-card); display: flex; align-items: center; gap: 8px;
 }
-.run-chip.active { border-color: var(--primary); background: rgba(79,142,247,0.12); color: var(--primary); }
-.run-chip:hover  { border-color: var(--border2); background: rgba(255,255,255,0.06); }
-.run-chip .chip-badge {
-    font-size: 0.65rem; padding: 1px 6px; border-radius: 99px;
-    font-weight: 700;
-}
-.baseline-badge  { background: rgba(79,142,247,0.2); color: var(--primary); }
-.hardened-badge  { background: rgba(16,185,129,0.2); color: var(--green); }
+.run-chip.active { border-color: var(--primary); background: rgba(56, 189, 248, 0.15); color: var(--primary); }
+.run-chip:hover  { border-color: var(--primary); background: rgba(255,255,255,0.06); }
+.chip-badge { font-size: 0.65rem; padding: 2px 7px; border-radius: 99px; font-weight: 800; }
+.baseline-badge { background: rgba(56, 189, 248, 0.25); color: var(--primary); }
+.hardened-badge { background: rgba(16, 185, 129, 0.25); color: var(--status-safe); }
 
-/* Before/After chart */
-.before-after-section {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-}
+.before-after-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 800px) { .before-after-section { grid-template-columns: 1fr; } }
 
-/* Filter bar */
-.filter-bar {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-}
+.filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .filter-btn {
-    padding: 5px 14px; border-radius: 99px; font-size: 0.78rem; font-weight: 600;
-    border: 1px solid var(--border2); background: var(--card);
-    cursor: pointer; color: var(--muted); transition: all 0.2s;
+    padding: 6px 16px; border-radius: 99px; font-size: 0.78rem; font-weight: 700;
+    border: 1px solid var(--border-bright); background: var(--bg-card);
+    cursor: pointer; color: var(--text-muted); transition: all 0.2s;
 }
-.filter-btn.active { color: var(--text); border-color: var(--primary); background: rgba(79,142,247,0.1); }
+.filter-btn.active { color: #ffffff; border-color: var(--primary); background: rgba(56, 189, 248, 0.15); }
 
-/* Results Table */
+/* Enterprise Results Table */
 .results-table { width: 100%; border-collapse: collapse; }
 .results-table th {
-    text-align: left; padding: 10px 14px; font-size: 0.72rem; font-weight: 700;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
-    border-bottom: 1px solid var(--border); white-space: nowrap;
+    text-align: left; padding: 12px 16px; font-size: 0.72rem; font-weight: 800;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border-subtle); white-space: nowrap;
 }
 .results-table td {
-    padding: 12px 14px; font-size: 0.84rem;
-    border-bottom: 1px solid rgba(26,37,64,0.5);
-    vertical-align: middle;
+    padding: 14px 16px; font-size: 0.85rem;
+    border-bottom: 1px solid rgba(27, 42, 71, 0.6); vertical-align: middle;
 }
-.results-table tr:last-child td { border-bottom: none; }
-.results-table tr.row-main:hover td { background: rgba(255,255,255,0.02); }
-.results-table tr.row-expand td { padding: 0; }
+.results-table tr.row-main:hover td { background: rgba(255, 255, 255, 0.025); }
 
 .risk-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 10px; border-radius: 99px;
-    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 99px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
 }
-.risk-critical { background: rgba(244,63,94,0.2);  color: var(--red); border: 1px solid rgba(244,63,94,0.3); }
-.risk-high     { background: rgba(245,158,11,0.2); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.risk-critical { background: var(--status-vuln-g); color: var(--status-vuln); border: 1px solid rgba(244,63,94,0.3); }
+.risk-high     { background: var(--status-warn-g); color: var(--status-warn); border: 1px solid rgba(245,158,11,0.3); }
 .risk-medium   { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
-.risk-low      { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-.risk-unknown  { background: rgba(107,127,163,0.15); color: var(--muted); border: 1px solid var(--border2); }
-
-.run-label-badge {
-    font-size: 0.65rem; padding: 2px 8px; border-radius: 99px; font-weight: 700;
-    background: rgba(79,142,247,0.15); color: var(--primary);
-    border: 1px solid rgba(79,142,247,0.3);
-}
+.risk-low      { background: var(--status-safe-g); color: var(--status-safe); border: 1px solid rgba(16,185,129,0.3); }
 
 .cred-chip {
-    font-family: var(--mono); font-size: 0.75rem; color: var(--red);
-    background: rgba(244,63,94,0.1); padding: 2px 8px; border-radius: 5px;
-    border: 1px solid rgba(244,63,94,0.2);
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--status-vuln);
+    background: rgba(244, 63, 94, 0.12); padding: 3px 9px; border-radius: 6px;
+    border: 1px solid rgba(244, 63, 94, 0.3); font-weight: 600;
 }
 
-/* Expand row */
-.expand-toggle { cursor: pointer; font-size: 0.75rem; color: var(--muted); user-select: none; }
-.expand-toggle:hover { color: var(--text); }
-.row-detail {
-    display: none; padding: 12px 14px;
-    background: rgba(2,4,10,0.6);
-    border-top: 1px solid var(--border);
-}
-.row-detail.open { display: block; }
-.attempt-log { font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; color: var(--muted); }
-
-/* ── TAB 4: REPORT ────────────────────────────────────────────────────────── */
+/* ── TAB 4: REPORT & AUDIT EVIDENCE ───────────────────────────────────────── */
 .report-grid {
-    display: grid; grid-template-columns: 1fr 360px; gap: 24px;
-    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 380px; gap: 28px;
+    max-width: 1440px; margin: 0 auto;
 }
 @media (max-width: 1000px) { .report-grid { grid-template-columns: 1fr; } }
 
-.report-preview {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-    padding: 28px; display: flex; flex-direction: column; gap: 20px;
-}
-.export-actions { display: flex; flex-direction: column; gap: 12px; }
 .export-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;
+    padding: 20px; display: flex; flex-direction: column; gap: 12px;
 }
-.export-card-title { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-.export-card-desc  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+.export-card-title { font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; gap: 10px; }
+.export-card-desc  { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
 
-/* ── Radial SVG Network Map ────────────────────────────────────────────────── */
-.node-ring {
-    fill: none; stroke: rgba(26,37,64,0.8);
+/* ── Modal Pop-up Component ───────────────────────────────────────────────── */
+.modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(4, 7, 15, 0.88); backdrop-filter: blur(14px);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+    padding: 24px; animation: modalFadeIn 0.25s ease;
 }
-.node-ring-2 { stroke: rgba(26,37,64,0.5); }
+@keyframes modalFadeIn { from{opacity:0; transform:scale(0.96)} to{opacity:1; transform:scale(1)} }
 
-.radar-sweep {
-    transform-origin: center;
-    animation: sweep 4s linear infinite;
-    opacity: 0.15;
+.modal-content {
+    background: var(--bg-panel); border: 1px solid var(--border-bright);
+    border-radius: 24px; width: 100%; max-width: 700px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.2);
+    padding: 32px; display: flex; flex-direction: column; gap: 22px;
+    position: relative;
 }
-@keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.modal-close {
+    position: absolute; top: 22px; right: 22px;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-bright);
+    color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1.1rem; transition: all 0.2s;
+}
+.modal-close:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.12); }
 
-/* ── Misc Utilities ───────────────────────────────────────────────────────── */
-.divider { height: 1px; background: var(--border); }
+.device-viewport-box {
+    background: #02050c; border: 1px solid var(--border-bright);
+    border-radius: 14px; height: 180px; position: relative;
+    overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 16px;
+}
+
+.chart-wrap { position: relative; height: 240px; }
+.hidden { display: none !important; }
 .flex-row { display: flex; align-items: center; gap: 10px; }
 .flex-between { display: flex; align-items: center; justify-content: space-between; }
-.gap-8  { gap: 8px; }
-.gap-12 { gap: 12px; }
-.gap-16 { gap: 16px; }
-.text-muted { color: var(--muted); }
-.text-sm    { font-size: 0.8rem; }
-.text-xs    { font-size: 0.72rem; }
-.font-mono  { font-family: var(--mono); }
-.fw-700     { font-weight: 700; }
-.mt-4       { margin-top: 4px; }
-.mt-8       { margin-top: 8px; }
-.mb-4       { margin-bottom: 4px; }
-.hidden     { display: none !important; }
-
-/* Empty state */
-.empty-state {
-    text-align: center; padding: 48px 24px;
-    display: flex; flex-direction: column; align-items: center; gap: 14px;
-}
-.empty-icon { font-size: 2.5rem; opacity: 0.5; }
-.empty-title { font-size: 1rem; font-weight: 700; color: var(--muted); }
-.empty-desc  { font-size: 0.82rem; color: var(--dim); max-width: 320px; line-height: 1.5; }
-
-/* Alert */
-.alert {
-    padding: 12px 16px; border-radius: 10px; font-size: 0.82rem;
-    display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
-}
-.alert-warn { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
-.alert-ok   { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
-.alert-err  { background: rgba(244,63,94,0.1);  border: 1px solid rgba(244,63,94,0.3);  color: #fca5a5; }
-.alert-info { background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.3); color: #93c5fd; }
-
-/* ── Before/After Chart ───────────────────────────────────────────────────── */
-.chart-wrap { position: relative; height: 220px; }
-
-/* Number input spinner */
-input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 </style>
 </head>
 <body>
 <div class="app">
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     TOP NAVIGATION BAR
+     ENTERPRISE TOP NAVIGATION BAR
 ════════════════════════════════════════════════════════════════════════════ -->
 <nav class="topbar">
     <div class="brand">
-        <div class="brand-icon">🛡️</div>
+        <div class="brand-shield">🛡️</div>
         <div>
             <div class="brand-name">SENTRYMESH</div>
-            <div class="brand-sub">IoT Default Credential Scanner</div>
+            <div class="brand-sub">Enterprise IoT Security Platform</div>
         </div>
     </div>
 
     <div class="nav-tabs">
         <button class="nav-tab active" id="tab-btn-connect" onclick="switchTab('connect')">
-            📡 Connect
+            📡 Network Topology
         </button>
         <button class="nav-tab" id="tab-btn-scan" onclick="switchTab('scan')">
-            ⚡ Live Scan
+            ⚡ Live Audit Terminal
             <span class="tab-badge" id="scan-badge"></span>
         </button>
         <button class="nav-tab" id="tab-btn-results" onclick="switchTab('results')">
-            📊 Results
+            📊 Executive Results
             <span class="tab-badge" id="results-badge"></span>
         </button>
         <button class="nav-tab" id="tab-btn-report" onclick="switchTab('report')">
-            📄 Report
+            📄 Audit Report
         </button>
     </div>
 
-    <div class="status-pill">
+    <div class="status-bar-right">
         <button class="btn btn-green btn-sm" id="btn-quick-pipeline" onclick="runFullPipelineUI()">
-            ⚡ 1-Click Full Pipeline
+            ⚡ 1-Click Full Audit
         </button>
-        <div class="dot" id="global-dot"></div>
-        <span id="global-status-text">Checking...</span>
+        <div class="status-pill">
+            <div class="dot" id="global-dot"></div>
+            <span id="global-status-text">Connecting...</span>
+        </div>
     </div>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     TAB 1: CONNECT / SETUP
+     TAB 1: CONNECT & TOPOLOGY
 ════════════════════════════════════════════════════════════════════════════ -->
 <div class="tab-content active" id="tab-connect">
     <div class="connect-grid">
 
-        <!-- Left: Network Map -->
+        <!-- Radar Topology Map -->
         <div class="radar-container">
             <div class="panel-header">
-                <div class="panel-title"><span class="icon">🌐</span> Network Topology — tun0</div>
-                <div class="flex-row gap-8">
+                <div class="panel-title"><span class="icon">🌐</span> 6LoWPAN Mesh Topology — tun0</div>
+                <div class="flex-row">
                     <div class="dot" id="connect-net-dot"></div>
-                    <span class="text-sm text-muted" id="connect-net-label">Offline</span>
+                    <span class="text-sm font-mono text-muted" id="connect-net-label">Offline</span>
                 </div>
             </div>
             <div class="radar-svg-wrap">
                 <svg id="connect-radar-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Rings -->
-                    <circle cx="200" cy="200" r="160" class="node-ring" stroke-width="1"/>
-                    <circle cx="200" cy="200" r="110" class="node-ring" stroke-width="1"/>
-                    <circle cx="200" cy="200" r="60"  class="node-ring" stroke-width="1"/>
-                    <!-- Crosshairs -->
-                    <line x1="200" y1="40" x2="200" y2="360" stroke="rgba(26,37,64,0.5)" stroke-width="1"/>
-                    <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(26,37,64,0.5)" stroke-width="1"/>
-                    <!-- Radar sweep -->
-                    <path id="radar-sweep-c" class="radar-sweep"
-                        d="M200,200 L200,40 A160,160 0 0,1 360,200 Z"
-                        fill="url(#sweepGrad)" stroke="none"/>
-                    <defs>
-                        <radialGradient id="sweepGrad" cx="0%" cy="50%" r="100%" fx="0%" fy="50%">
-                            <stop offset="0%"   stop-color="#4f8ef7" stop-opacity="0.6"/>
-                            <stop offset="100%" stop-color="#4f8ef7" stop-opacity="0"/>
-                        </radialGradient>
-                    </defs>
-                    <!-- Border Router (center) -->
-                    <circle cx="200" cy="200" r="18" fill="rgba(79,142,247,0.15)" stroke="rgba(79,142,247,0.6)" stroke-width="2"/>
-                    <text x="200" y="196" text-anchor="middle" fill="#4f8ef7" font-size="9" font-family="Fira Code" font-weight="600">BR</text>
-                    <text x="200" y="207" text-anchor="middle" fill="#4f8ef7" font-size="7" font-family="Fira Code">fd00::1</text>
-                    <!-- Device nodes — filled by JS -->
+                    <circle cx="200" cy="200" r="160" stroke="rgba(45, 66, 104, 0.6)" fill="none" stroke-width="1"/>
+                    <circle cx="200" cy="200" r="115" stroke="rgba(45, 66, 104, 0.8)" fill="none" stroke-width="1.5"/>
+                    <circle cx="200" cy="200" r="60"  stroke="rgba(45, 66, 104, 0.6)" fill="none" stroke-width="1"/>
+                    <line x1="200" y1="40" x2="200" y2="360" stroke="rgba(45, 66, 104, 0.4)" stroke-width="1"/>
+                    <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(45, 66, 104, 0.4)" stroke-width="1"/>
+                    <!-- Border Router (Center Node) -->
+                    <circle cx="200" cy="200" r="20" fill="rgba(56, 189, 248, 0.2)" stroke="rgba(56, 189, 248, 0.8)" stroke-width="2"/>
+                    <text x="200" y="196" text-anchor="middle" fill="#38bdf8" font-size="9" font-family="JetBrains Mono" font-weight="700">ROOT</text>
+                    <text x="200" y="208" text-anchor="middle" fill="#38bdf8" font-size="7.5" font-family="JetBrains Mono">fd00::1</text>
                     <g id="connect-nodes"></g>
                 </svg>
             </div>
-
-            <!-- Legend -->
-            <div class="flex-row gap-16 text-xs text-muted" style="padding-top:8px; border-top: 1px solid var(--border);">
-                <span>⭕ Not scanned</span>
-                <span style="color:var(--amber)">🟡 Scanning</span>
-                <span style="color:var(--red)">🔴 Vulnerable</span>
-                <span style="color:var(--green)">🟢 Protected</span>
+            <div class="flex-between text-xs text-muted" style="padding-top:10px; border-top: 1px solid var(--border-subtle);">
+                <span>Click any mote node for deep inspection & quick hardening</span>
+                <span>🟢 Protected · 🔴 Vulnerable · 🟡 Probing</span>
             </div>
         </div>
 
-        <!-- Right: Controls -->
-        <div class="connect-info">
-
-            <!-- Interface info -->
+        <!-- Controls Side Panel -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
             <div class="panel panel-sm">
                 <div class="panel-header" style="margin-bottom:12px;">
-                    <div class="panel-title"><span class="icon">🔌</span> Interface / Bridge</div>
+                    <div class="panel-title"><span class="icon">🔌</span> Network Interface & Gateway</div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex; flex-direction:column; gap:10px;">
                     <div class="iface-row">
                         <div>
-                            <div class="iface-label">Network Interface</div>
+                            <div class="iface-label">Interface</div>
                             <div class="iface-value">tun0 (simulated)</div>
                         </div>
-                        <span class="text-xs font-mono text-muted">6LoWPAN</span>
+                        <span class="font-mono text-xs text-muted">6LoWPAN</span>
                     </div>
                     <div class="iface-row">
                         <div>
-                            <div class="iface-label">Border Router</div>
-                            <div class="iface-value" id="br-status-val">not connected</div>
+                            <div class="iface-label">Border Gateway</div>
+                            <div class="iface-value" id="br-status-val">fd00::1</div>
                         </div>
                         <div class="dot" id="br-dot"></div>
-                    </div>
-                    <div class="iface-row">
-                        <div>
-                            <div class="iface-label">Protocol Stack</div>
-                            <div class="iface-value">Contiki-NG · RPL · CoAP</div>
-                        </div>
-                        <span class="text-xs text-muted">IPv6</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Network Toggle -->
+            <!-- Network Toggle & Config -->
             <div class="panel panel-sm">
-                <div class="panel-title" style="margin-bottom:14px;"><span class="icon">⚙️</span> Network Control</div>
-                <div class="toggle-wrap" style="margin-bottom:14px;">
+                <div class="panel-title" style="margin-bottom:14px;"><span class="icon">⚙️</span> Network Simulator Control</div>
+                <div class="toggle-wrap" style="margin-bottom:16px;">
                     <div>
-                        <div style="font-weight:700; font-size:0.9rem;">IoT Simulator Network</div>
-                        <div class="text-xs text-muted mt-4">Launch all 8 virtual motes (localhost)</div>
+                        <div style="font-weight:700; font-size:0.92rem;">Virtual IoT Mesh Network</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">Launch all 8 virtual motes</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="net-toggle" onchange="handleNetToggle()">
@@ -722,22 +600,21 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
                     </label>
                 </div>
 
-                <!-- Scan config -->
                 <div style="margin-bottom:14px;">
-                    <div class="config-label mb-4">Scan Label (for before/after comparison)</div>
+                    <div class="config-label mb-4">Audit Run Label</div>
                     <input type="text" class="input" id="run-label-input" value="Baseline scan" placeholder="e.g. Baseline scan">
                 </div>
 
-                <div class="scan-config-grid" style="margin-bottom:14px;">
+                <div class="scan-config-grid" style="margin-bottom:16px;">
                     <div class="config-field">
-                        <div class="config-label">Max attempts / device</div>
-                        <input type="number" class="input" id="max-attempts-input" value="40" min="1" max="66">
+                        <div class="config-label">Max Attempts/Device</div>
+                        <input type="number" class="input" id="max-attempts-input" value="50" min="1" max="100">
                     </div>
                     <div class="config-field">
-                        <div class="config-label">Target filter</div>
+                        <div class="config-label">Target Filter</div>
                         <select class="input" id="hardened-only-select">
-                            <option value="false">All devices</option>
-                            <option value="true">Hardened only</option>
+                            <option value="false">All Devices</option>
+                            <option value="true">Hardened Only</option>
                         </select>
                     </div>
                 </div>
@@ -747,53 +624,46 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
                 </button>
             </div>
 
-            <!-- Device Hardening & Password Remediation Panel -->
+            <!-- Device Hardening Studio Panel -->
             <div class="panel panel-sm">
-                <div class="panel-title" style="margin-bottom:14px;"><span class="icon">🛡️</span> Device Hardening & Password Change</div>
+                <div class="panel-title" style="margin-bottom:14px;"><span class="icon">🛡️</span> Device Hardening Studio</div>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     <div>
-                        <div class="config-label mb-4">Select Device to Harden</div>
-                        <select class="input" id="remediation-device-select">
+                        <div class="config-label mb-4">Select Target Device</div>
+                        <select class="input" id="remediation-device-select" onchange="onSidePanelDeviceSelect(this.value)">
                             <option value="">Select a device...</option>
                         </select>
                     </div>
                     <div>
-                        <div class="config-label mb-4">New Strong Password</div>
-                        <input type="text" class="input" id="remediation-pass-input" value="SentryMesh#Pass2026!" placeholder="New password">
+                        <div class="config-label mb-4">New Hardened Password <span style="color:var(--text-dim); font-size:0.7rem; font-weight:400;">(auto-generated per device)</span></div>
+                        <input type="text" class="input" id="remediation-pass-input" value="" placeholder="Select a device to generate password">
                     </div>
                     <button class="btn btn-green btn-full btn-sm" onclick="applyDevicePasswordChange()">
-                        🔒 Change Password & Re-Audit
+                        🔒 Harden Credential & Re-Audit
                     </button>
-                    <div id="remediation-status-msg" class="text-xs font-mono" style="display:none; padding:8px; border-radius:6px;"></div>
+                    <div id="remediation-status-msg" class="font-mono text-xs" style="display:none; padding:8px; border-radius:6px;"></div>
                 </div>
             </div>
 
-            <!-- Device discovery list -->
+            <!-- Discovery List -->
             <div class="panel panel-sm" style="flex:1;">
                 <div class="panel-header" style="margin-bottom:12px;">
-                    <div class="panel-title"><span class="icon">📡</span> RPL Neighbor Discovery</div>
-                    <span class="text-xs text-muted" id="disc-count">0 / 8 online</span>
+                    <div class="panel-title"><span class="icon">📡</span> Discovered RPL Motes</div>
+                    <span class="text-xs text-muted" id="disc-count">0 / 8 Online</span>
                 </div>
-                <div class="device-discovery-list" id="device-disc-list">
-                    <div class="empty-state" style="padding:24px;">
-                        <div class="empty-icon">📡</div>
-                        <div class="empty-desc">Start the network to discover motes</div>
-                    </div>
-                </div>
+                <div class="device-discovery-list" id="device-disc-list"></div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     TAB 2: LIVE SCAN
+     TAB 2: LIVE AUDIT TERMINAL
 ════════════════════════════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-scan">
     <div class="scan-grid">
 
-        <!-- Left: Map + Progress -->
-        <div class="scan-left">
-            <!-- Running counters -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
             <div class="scan-stats-row">
                 <div class="scan-stat-card">
                     <div class="scan-stat-num total" id="live-total">0</div>
@@ -809,60 +679,49 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
                 </div>
             </div>
 
-            <!-- Radial map (scan state) -->
             <div class="panel" style="flex:1;">
                 <div class="panel-header">
-                    <div class="panel-title"><span class="icon">🗺️</span> Live Network Map</div>
-                    <span class="text-xs font-mono text-muted" id="scan-label-display">—</span>
+                    <div class="panel-title"><span class="icon">🗺️</span> Live Probe Topology</div>
+                    <span class="font-mono text-xs text-muted" id="scan-label-display">—</span>
                 </div>
                 <div class="radar-svg-wrap">
                     <svg id="scan-radar-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <filter id="glow-red"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                            <filter id="glow-green"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                            <filter id="glow-amber"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                        </defs>
-                        <circle cx="200" cy="200" r="160" class="node-ring" stroke-width="1"/>
-                        <circle cx="200" cy="200" r="110" class="node-ring node-ring-2" stroke-width="1"/>
-                        <circle cx="200" cy="200" r="60"  class="node-ring" stroke-width="1"/>
-                        <line x1="200" y1="40" x2="200" y2="360" stroke="rgba(26,37,64,0.4)" stroke-width="1"/>
-                        <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(26,37,64,0.4)" stroke-width="1"/>
-                        <!-- Border router -->
-                        <circle cx="200" cy="200" r="18" fill="rgba(79,142,247,0.2)" stroke="rgba(79,142,247,0.7)" stroke-width="2"/>
-                        <text x="200" y="196" text-anchor="middle" fill="#4f8ef7" font-size="9" font-family="Fira Code" font-weight="600">BR</text>
-                        <text x="200" y="207" text-anchor="middle" fill="#4f8ef7" font-size="7" font-family="Fira Code">fd00::1</text>
+                        <circle cx="200" cy="200" r="160" stroke="rgba(45, 66, 104, 0.6)" fill="none" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="115" stroke="rgba(45, 66, 104, 0.8)" fill="none" stroke-width="1.5"/>
+                        <circle cx="200" cy="200" r="60"  stroke="rgba(45, 66, 104, 0.6)" fill="none" stroke-width="1"/>
+                        <line x1="200" y1="40" x2="200" y2="360" stroke="rgba(45, 66, 104, 0.4)" stroke-width="1"/>
+                        <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(45, 66, 104, 0.4)" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="20" fill="rgba(56, 189, 248, 0.2)" stroke="rgba(56, 189, 248, 0.8)" stroke-width="2"/>
+                        <text x="200" y="196" text-anchor="middle" fill="#38bdf8" font-size="9" font-family="JetBrains Mono" font-weight="700">ROOT</text>
+                        <text x="200" y="208" text-anchor="middle" fill="#38bdf8" font-size="7.5" font-family="JetBrains Mono">fd00::1</text>
                         <g id="scan-nodes"></g>
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Right: Terminal + Node list -->
-        <div class="scan-right">
-
-            <!-- Terminal -->
-            <div class="terminal" style="flex:1; min-height:380px;">
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="terminal" style="flex:1; min-height:400px;">
                 <div class="terminal-header">
                     <div class="terminal-dots">
                         <div class="terminal-dot red"></div>
                         <div class="terminal-dot amber"></div>
                         <div class="terminal-dot green"></div>
                     </div>
-                    <span class="terminal-title">SENTRYMESH — scan.log (live)</span>
-                    <span style="margin-left:auto; font-family:var(--mono); font-size:0.65rem; color:var(--dim);" id="sse-status">⬤ stream</span>
+                    <span class="terminal-title">SENTRYMESH — scan.log (live SSE feed)</span>
+                    <span style="margin-left:auto; font-family:var(--font-mono); font-size:0.7rem; color:var(--status-safe);" id="sse-status">● live stream</span>
                 </div>
                 <div class="terminal-body" id="terminal-body">
-                    <div class="log-line log-info">[SENTRYMESH] Waiting for scan to start...</div>
+                    <div class="log-line log-info">[SENTRYMESH] Ready. Launch security audit to begin...</div>
                 </div>
             </div>
 
-            <!-- Node status list -->
             <div class="panel panel-sm">
                 <div class="panel-header" style="margin-bottom:12px;">
-                    <div class="panel-title"><span class="icon">📋</span> Device Status</div>
+                    <div class="panel-title"><span class="icon">📋</span> Device Audit Telemetry</div>
                 </div>
                 <div class="node-progress-list" id="node-progress-list">
-                    <div class="text-sm text-muted" style="padding:8px;">No scan in progress</div>
+                    <div class="text-sm text-muted" style="padding:8px;">No active audit</div>
                 </div>
             </div>
         </div>
@@ -870,72 +729,58 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     TAB 3: RESULTS
+     TAB 3: RESULTS & METRICS
 ════════════════════════════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-results">
     <div class="results-grid">
-
-        <!-- Stat Cards -->
         <div class="stat-cards-row">
             <div class="stat-card blue">
-                <div class="stat-icon">🎯</div>
                 <div class="stat-num" id="res-total">—</div>
-                <div class="stat-label">Devices Scanned</div>
+                <div class="stat-label">Devices Audited</div>
             </div>
             <div class="stat-card red">
-                <div class="stat-icon">🔓</div>
                 <div class="stat-num" id="res-cracked">—</div>
                 <div class="stat-label">Compromised</div>
             </div>
             <div class="stat-card green">
-                <div class="stat-icon">🔒</div>
                 <div class="stat-num" id="res-safe">—</div>
                 <div class="stat-label">Protected</div>
             </div>
             <div class="stat-card amber">
-                <div class="stat-icon">📈</div>
                 <div class="stat-num" id="res-vulnrate">—</div>
                 <div class="stat-label">Vulnerability Rate</div>
             </div>
         </div>
 
-        <!-- Run History Selector -->
         <div class="panel panel-sm">
-            <div class="flex-between flex-row" style="flex-wrap:wrap; gap:10px;">
-                <div class="panel-title"><span class="icon">🕐</span> Scan Runs</div>
-                <button class="btn btn-ghost btn-sm" onclick="loadHistory()">↻ Refresh</button>
+            <div class="flex-between">
+                <div class="panel-title"><span class="icon">🕐</span> Audit History Runs</div>
+                <button class="btn btn-ghost btn-sm" onclick="loadHistory()">↻ Refresh History</button>
             </div>
-            <div class="run-history-bar" id="run-history-bar" style="margin-top:12px;">
-                <span class="text-xs text-muted">No scan history yet</span>
+            <div class="run-history-bar" id="run-history-bar" style="margin-top:14px;">
+                <span class="text-xs text-muted">Loading audit history...</span>
             </div>
         </div>
 
-        <!-- Before/After Comparison (shown when 2+ runs exist) -->
         <div id="before-after-section" class="panel hidden">
             <div class="panel-header">
-                <div class="panel-title"><span class="icon">📊</span> Before / After Comparison</div>
-                <span class="text-xs text-muted">Compare vulnerability rates across scan runs</span>
+                <div class="panel-title"><span class="icon">📊</span> Before / After Comparison Analytics</div>
             </div>
             <div class="before-after-section">
-                <div class="chart-wrap">
-                    <canvas id="before-after-chart"></canvas>
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="risk-dist-chart"></canvas>
-                </div>
+                <div class="chart-wrap"><canvas id="before-after-chart"></canvas></div>
+                <div class="chart-wrap"><canvas id="risk-dist-chart"></canvas></div>
             </div>
         </div>
 
-        <!-- Filterable Table -->
         <div class="panel">
             <div class="panel-header">
-                <div class="panel-title"><span class="icon">📋</span> Device Risk Table</div>
+                <div class="panel-title"><span class="icon">📋</span> Device Vulnerability Matrix</div>
                 <div class="filter-bar">
                     <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">All</button>
                     <button class="filter-btn" id="filter-critical" onclick="setFilter('critical')">🔴 Critical</button>
                     <button class="filter-btn" id="filter-high" onclick="setFilter('high')">🟠 High</button>
-                    <button class="filter-btn" id="filter-cracked" onclick="setFilter('cracked')">🔓 Cracked</button>
-                    <button class="filter-btn" id="filter-safe" onclick="setFilter('safe')">🔒 Safe</button>
+                    <button class="filter-btn" id="filter-cracked" onclick="setFilter('cracked')">🔓 Compromised</button>
+                    <button class="filter-btn" id="filter-safe" onclick="setFilter('safe')">🔒 Protected</button>
                 </div>
             </div>
             <div style="overflow-x:auto;">
@@ -943,25 +788,19 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Device</th>
+                            <th>Device Name</th>
                             <th>Type</th>
                             <th>IPv6 Address</th>
                             <th>Service</th>
-                            <th>Cred Found</th>
+                            <th>Credential Found</th>
                             <th>Attempts</th>
-                            <th>Time</th>
-                            <th>Risk</th>
-                            <th>Run</th>
+                            <th>Latency</th>
+                            <th>Risk Posture</th>
+                            <th>Audit Label</th>
                         </tr>
                     </thead>
                     <tbody id="results-tbody">
-                        <tr><td colspan="10">
-                            <div class="empty-state">
-                                <div class="empty-icon">📊</div>
-                                <div class="empty-title">No scan data</div>
-                                <div class="empty-desc">Run a security audit from the Connect tab to see results here.</div>
-                            </div>
-                        </td></tr>
+                        <tr><td colspan="10" style="text-align:center; padding:32px;" class="text-muted">No audit data available</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -970,92 +809,69 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     TAB 4: REPORT / EXPORT
+     TAB 4: REPORT & AUDIT EVIDENCE
 ════════════════════════════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-report">
     <div class="report-grid">
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><span class="icon">📄</span> Executive Summary & Evidence Preview</div>
+                </div>
 
-        <!-- Preview area -->
-        <div class="report-preview">
-            <div class="panel-header">
-                <div class="panel-title"><span class="icon">📄</span> Report Preview & Summary</div>
-            </div>
+                <div class="stat-cards-row" style="grid-template-columns:repeat(2,1fr); margin-bottom:20px;">
+                    <div class="stat-card blue"><div class="stat-num" id="rpt-total">—</div><div class="stat-label">Total Audited</div></div>
+                    <div class="stat-card red"><div class="stat-num" id="rpt-cracked">—</div><div class="stat-label">Compromised</div></div>
+                    <div class="stat-card green"><div class="stat-num" id="rpt-safe">—</div><div class="stat-label">Protected</div></div>
+                    <div class="stat-card amber"><div class="stat-num" id="rpt-vulnrate">—</div><div class="stat-label">Vulnerability Rate</div></div>
+                </div>
 
-            <div id="report-summary-cards" class="stat-cards-row" style="grid-template-columns:repeat(2,1fr);">
-                <div class="stat-card blue"><div class="stat-num" id="rpt-total">—</div><div class="stat-label">Devices Audited</div></div>
-                <div class="stat-card red"><div class="stat-num" id="rpt-cracked">—</div><div class="stat-label">Compromised</div></div>
-                <div class="stat-card green"><div class="stat-num" id="rpt-safe">—</div><div class="stat-label">Protected</div></div>
-                <div class="stat-card amber"><div class="stat-num" id="rpt-vulnrate">—</div><div class="stat-label">Vuln Rate</div></div>
-            </div>
-
-            <!-- Raw log preview -->
-            <div>
-                <div class="config-label mb-4">Raw Scan Evidence (log preview)</div>
-                <div class="terminal" style="min-height:0;">
-                    <div class="terminal-header">
-                        <div class="terminal-dots">
-                            <div class="terminal-dot red"></div>
-                            <div class="terminal-dot amber"></div>
-                            <div class="terminal-dot green"></div>
+                <div>
+                    <div class="config-label mb-4">Raw Evidence Log (`raw_scan.log`)</div>
+                    <div class="terminal" style="min-height:0;">
+                        <div class="terminal-header">
+                            <div class="terminal-dots"><div class="terminal-dot red"></div><div class="terminal-dot amber"></div><div class="terminal-dot green"></div></div>
+                            <span class="terminal-title">raw_scan.log</span>
                         </div>
-                        <span class="terminal-title">raw_scan.log</span>
-                    </div>
-                    <div class="terminal-body" id="rawlog-preview" style="max-height:180px; font-size:0.72rem;">
-                        <div class="log-line log-info">[—] Run a scan to generate evidence log</div>
+                        <div class="terminal-body" id="rawlog-preview" style="max-height:200px;">
+                            <div class="log-line log-info">[—] Run an audit to generate raw evidence log</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Per-protocol breakdown -->
-            <div>
-                <div class="config-label mb-4">Protocol Coverage</div>
-                <div id="proto-breakdown" class="device-discovery-list"></div>
+            <div id="inline-report-container" class="panel hidden" style="padding:0; overflow:hidden;">
+                <div class="panel-header" style="padding:16px 24px; background:var(--bg-card); margin-bottom:0;">
+                    <div class="panel-title"><span class="icon">👁️</span> HTML Report Live Viewport</div>
+                    <button class="btn btn-ghost btn-sm" onclick="toggleInlineReport()">✕ Close Viewport</button>
+                </div>
+                <iframe id="inline-report-iframe" style="width:100%; height:650px; border:none; background:#ffffff;"></iframe>
             </div>
         </div>
 
-        <!-- Export actions -->
-        <div style="display:flex; flex-direction:column; gap:16px;">
+        <div style="display:flex; flex-direction:column; gap:20px;">
             <div class="panel panel-sm">
-                <div class="panel-title" style="margin-bottom:16px;"><span class="icon">📥</span> Export Options</div>
-                <div class="export-actions">
-
+                <div class="panel-title" style="margin-bottom:16px;"><span class="icon">📥</span> Export Artifacts</div>
+                <div style="display:flex; flex-direction:column; gap:14px;">
                     <div class="export-card">
-                        <div class="export-card-title">📄 Static HTML Report</div>
-                        <div class="export-card-desc">Full self-contained report with charts, per-device cards, and hardening recommendations. Grader-ready, single file.</div>
-                        <button class="btn btn-primary btn-full" id="btn-gen-report" onclick="generateReport()">
-                            ⚡ Generate Report
-                        </button>
-                        <button class="btn btn-ghost btn-full" id="btn-view-inline-report" onclick="toggleInlineReport()">
-                            👁️ View Report Inline
-                        </button>
-                        <a id="report-download-link" class="btn btn-green btn-full hidden" href="/api/report/download">
-                            📥 Download HTML Report
-                        </a>
+                        <div class="export-card-title">📄 Static HTML Executive Report</div>
+                        <div class="export-card-desc">Self-contained HTML report with charts, risk matrices, and remediation steps.</div>
+                        <button class="btn btn-primary btn-full" id="btn-gen-report" onclick="generateReport()">⚡ Generate Report</button>
+                        <button class="btn btn-ghost btn-full" id="btn-view-inline-report" onclick="toggleInlineReport()">👁️ View Report Inline</button>
+                        <a id="report-download-link" class="btn btn-green btn-full hidden" href="/api/report/download">📥 Download Report</a>
                     </div>
 
                     <div class="export-card">
-                        <div class="export-card-title">🗂️ Raw Scan Log</div>
-                        <div class="export-card-desc">Timestamped per-attempt log showing every credential tried — the evidence file a grader needs to verify the scanner actually ran.</div>
-                        <a class="btn btn-ghost btn-full" href="/api/rawlog">
-                            📋 Download raw_scan.log
-                        </a>
+                        <div class="export-card-title">🗂️ Timestamped Evidence Log</div>
+                        <div class="export-card-desc">Raw per-attempt log demonstrating live socket authentication exchanges.</div>
+                        <a class="btn btn-ghost btn-full" href="/api/rawlog">📋 Download raw_scan.log</a>
                     </div>
 
                     <div class="export-card">
-                        <div class="export-card-title">📦 Structured JSON</div>
-                        <div class="export-card-desc">Formatted per-device JSON output in the brief's exact spec — ready to feed into any other analysis tool or dashboard.</div>
-                        <button class="btn btn-ghost btn-full" onclick="downloadJSON()">
-                            { } Download scan_results.json
-                        </button>
+                        <div class="export-card-title">📦 Structured Audit JSON</div>
+                        <div class="export-card-desc">Machine-readable JSON adhering strictly to assignment specification.</div>
+                        <button class="btn btn-ghost btn-full" onclick="downloadJSON()">{ } Download scan_results.json</button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Submission checklist -->
-            <div class="panel panel-sm">
-                <div class="panel-title" style="margin-bottom:14px;"><span class="icon">✅</span> Submission Checklist</div>
-                <div style="display:flex; flex-direction:column; gap:8px;" id="checklist">
-                    <!-- Filled by JS -->
                 </div>
             </div>
         </div>
@@ -1065,19 +881,18 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 </div><!-- .app -->
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     DEVICE POP-UP MODAL (Bigger View)
+     DEVICE INSPECTION & POP-UP MODAL
 ════════════════════════════════════════════════════════════════════════════ -->
 <div id="device-modal" class="modal-backdrop hidden" onclick="if(event.target===this)closeDeviceModal()">
     <div class="modal-content">
         <button class="modal-close" onclick="closeDeviceModal()">✕</button>
 
-        <!-- Header -->
         <div style="display:flex; align-items:center; gap:16px;">
-            <div id="m-icon" style="font-size:2rem; width:52px; height:52px; background:var(--card); border:1px solid var(--border2); border-radius:12px; display:flex; align-items:center; justify-content:center;">📦</div>
+            <div id="m-icon" style="font-size:2.2rem; width:56px; height:56px; background:var(--bg-card); border:1px solid var(--border-bright); border-radius:14px; display:flex; align-items:center; justify-content:center;">📦</div>
             <div>
-                <h2 id="m-title" style="font-size:1.3rem; font-weight:800; color:var(--text);">Device Name</h2>
-                <div style="display:flex; gap:10px; margin-top:4px;" class="font-mono text-xs">
-                    <span id="m-ip" style="color:var(--cyan);">fd00::201</span>
+                <h2 id="m-title" style="font-family:var(--font-heading); font-size:1.35rem; font-weight:800;">Device Name</h2>
+                <div style="display:flex; gap:12px; margin-top:4px;" class="font-mono text-xs">
+                    <span id="m-ip" style="color:var(--primary); font-weight:600;">fd00::201</span>
                     <span id="m-port" class="text-muted">PORT: 9010</span>
                     <span id="m-service" class="text-muted">CoAP/5683</span>
                 </div>
@@ -1085,29 +900,22 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
             <div style="margin-left:auto;" id="m-badge"></div>
         </div>
 
-        <!-- Visual Viewport / Telemetry Box -->
         <div class="device-viewport-box">
-            <div class="scanlines-overlay"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; z-index:2;" class="text-xs font-mono text-muted">
+            <div style="display:flex; justify-content:space-between; align-items:center; z-index:2;" class="font-mono text-xs text-muted">
                 <span id="m-hud-model">MODEL: Contiki-NG Node</span>
-                <span id="m-hud-status" style="color:var(--green)">ONLINE</span>
+                <span id="m-hud-status" style="color:var(--status-safe); font-weight:700;">● ONLINE</span>
             </div>
             <div style="text-align:center; z-index:2;">
-                <div id="m-viewport-main" style="font-size:1.1rem; font-weight:800; font-family:var(--mono);">
-                    STREAM / TELEMETRY ACTIVE
-                </div>
-                <div id="m-viewport-sub" class="text-xs text-muted" style="margin-top:4px;">
-                    RPL IPv6 Routing Active · Port 9010
-                </div>
+                <div id="m-viewport-main" style="font-size:1.25rem; font-weight:800; font-family:var(--font-mono); color:#ffffff;">STREAM / TELEMETRY ACTIVE</div>
+                <div id="m-viewport-sub" class="font-mono text-xs text-muted" style="margin-top:4px;">RPL IPv6 Routing Active · Port 9010</div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; z-index:2;" class="text-xs font-mono text-muted">
-                <span id="m-hud-proto">PROTOCOL: REST/CoAP</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; z-index:2;" class="font-mono text-xs text-muted">
+                <span id="m-hud-proto">SERVICE: REST/CoAP</span>
                 <span id="m-hud-hardened">DEFENSE: HARDENED</span>
             </div>
         </div>
 
-        <!-- Info Cards -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
             <div class="card">
                 <div class="config-label mb-4">Description</div>
                 <div id="m-desc" class="text-xs text-muted" style="line-height:1.5;">—</div>
@@ -1118,13 +926,12 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
             </div>
         </div>
 
-        <!-- Quick Hardening Action -->
-        <div class="card" style="display:flex; flex-direction:column; gap:10px; background:rgba(79,142,247,0.04); border-color:rgba(79,142,247,0.2);">
-            <div class="panel-title"><span class="icon">🔒</span> Quick Password Hardening</div>
-            <div class="flex-row gap-10">
-                <input type="text" class="input" id="m-pass-input" value="SentryMesh#Pass2026!" style="flex:1;">
+        <div class="card" style="display:flex; flex-direction:column; gap:12px; background:rgba(56, 189, 248, 0.05); border-color:rgba(56, 189, 248, 0.25);">
+            <div class="panel-title"><span class="icon">🔒</span> Direct Device Hardening</div>
+            <div class="flex-row" style="gap:12px;">
+                <input type="text" class="input" id="m-pass-input" value="" placeholder="Generating..." style="flex:1;">
                 <button class="btn btn-green btn-sm" id="m-btn-harden" onclick="applyModalPasswordChange()">
-                    🔒 Harden Now
+                    🔒 Harden Credential
                 </button>
             </div>
         </div>
@@ -1132,29 +939,26 @@ input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     JAVASCRIPT
+     JAVASCRIPT LOGIC
 ════════════════════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
-/* ── State ─────────────────────────────────────────────────────────────────── */
 let networkRunning   = false;
 let scanRunning      = false;
 let latestResults    = null;
 let scanHistory      = [];
 let activeFilter     = 'all';
-let activeRun        = null;   // filename of currently viewed run
+let activeRun        = null;
 let sseSource        = null;
 let beforeAfterChart = null;
 let riskDistChart    = null;
-let deviceNodes      = [];     // { device_id, display_name, device_type, simulated_ip, hardened }
-let nodeStates       = {};     // device_id -> 'pending' | 'scanning' | 'cracked' | 'safe'
+let deviceNodes      = [];
+let nodeStates       = {};
 
-/* Positions for 8 nodes around center (200,200) on radius 115 */
-const NODE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 const NODE_RADIUS = 115;
+const TYPE_ICONS  = { camera: '📷', sensor: '🌡️', router: '📡', smartplug: '🔌' };
 
-/* ── Tab Switching ─────────────────────────────────────────────────────────── */
 function switchTab(name) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
@@ -1165,7 +969,6 @@ function switchTab(name) {
     if (name === 'report')  { refreshReportView(); }
 }
 
-/* ── Initialization ─────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
     checkStatus();
     loadLatestResults();
@@ -1173,22 +976,17 @@ document.addEventListener('DOMContentLoaded', () => {
     connectSSE();
 });
 
-/* ── SSE (live log stream) ──────────────────────────────────────────────────── */
 function connectSSE() {
     if (sseSource) { sseSource.close(); }
     sseSource = new EventSource('/api/stream');
-
-    sseSource.onopen = () => {
-        document.getElementById('sse-status').style.color = 'var(--green)';
-    };
+    sseSource.onopen = () => { document.getElementById('sse-status').style.color = 'var(--status-safe)'; };
     sseSource.onmessage = (e) => {
         const msg = e.data;
         appendTerminalLine(msg);
-        // Parse scan progress hints from the live line
         updateNodeStateFromLog(msg);
     };
     sseSource.onerror = () => {
-        document.getElementById('sse-status').style.color = 'var(--red)';
+        document.getElementById('sse-status').style.color = 'var(--status-vuln)';
         setTimeout(connectSSE, 3000);
     };
 }
@@ -1199,7 +997,6 @@ function appendTerminalLine(msg) {
     line.className = 'log-line ' + classifyLogLine(msg);
     line.textContent = msg;
     body.appendChild(line);
-    // Keep last 300 lines
     while (body.children.length > 300) { body.removeChild(body.firstChild); }
     body.scrollTop = body.scrollHeight;
 }
@@ -1216,7 +1013,6 @@ function classifyLogLine(msg) {
 }
 
 function updateNodeStateFromLog(msg) {
-    // Detect which device is being scanned from log lines
     for (const dev of deviceNodes) {
         const id = dev.device_id;
         if (msg.includes(id)) {
@@ -1229,15 +1025,12 @@ function updateNodeStateFromLog(msg) {
                 const s = parseInt(document.getElementById('live-safe').textContent || '0');
                 document.getElementById('live-safe').textContent = s + 1;
             } else if (msg.includes('[*] Scanning')) {
-                if (nodeStates[id] === 'pending' || !nodeStates[id]) {
-                    setNodeState(id, 'scanning');
-                }
+                if (nodeStates[id] === 'pending' || !nodeStates[id]) { setNodeState(id, 'scanning'); }
             }
         }
     }
 }
 
-/* ── Status Check ────────────────────────────────────────────────────────── */
 async function checkStatus() {
     try {
         const res  = await fetch('/api/status');
@@ -1245,13 +1038,10 @@ async function checkStatus() {
         networkRunning = data.network_running;
         scanRunning    = data.scan_running;
         deviceNodes    = data.devices || [];
-
         updateGlobalStatus();
         updateConnectTab(data);
         updateNetworkMap('connect-nodes', deviceNodes, nodeStates);
-    } catch (err) {
-        console.warn('Status check failed:', err);
-    }
+    } catch (err) { }
 }
 
 function updateGlobalStatus() {
@@ -1259,17 +1049,15 @@ function updateGlobalStatus() {
     const text = document.getElementById('global-status-text');
 
     if (scanRunning) {
-        dot.className = 'dot scanning';
-        text.textContent = 'Scanning...';
+        dot.className = 'dot scanning'; text.textContent = 'Scanning...';
         document.getElementById('scan-badge').textContent = '●';
         document.getElementById('scan-badge').classList.add('show');
     } else if (networkRunning) {
         dot.className = 'dot online';
-        text.textContent = `Network Online · ${deviceNodes.filter(d=>d.online).length}/${deviceNodes.length} up`;
+        text.textContent = `Online · ${deviceNodes.filter(d=>d.online).length}/${deviceNodes.length} Up`;
         document.getElementById('scan-badge').classList.remove('show');
     } else {
-        dot.className = 'dot offline';
-        text.textContent = 'Network Offline';
+        dot.className = 'dot offline'; text.textContent = 'Offline';
         document.getElementById('scan-badge').classList.remove('show');
     }
 }
@@ -1280,26 +1068,19 @@ function updateConnectTab(data) {
     const brStatus = document.getElementById('br-status-val');
     const brDot    = document.getElementById('br-dot');
     const toggle   = document.getElementById('net-toggle');
-    const scanBtn  = document.getElementById('btn-launch-scan');
     const discCount = document.getElementById('disc-count');
 
     toggle.checked = networkRunning;
 
     if (networkRunning) {
-        netDot.className = 'dot online';
-        netLabel.textContent = 'Online';
+        netDot.className = 'dot online'; netLabel.textContent = 'Online';
         brStatus.textContent = data.border_router || 'fd00::1';
         brDot.className = 'dot online';
-        scanBtn.disabled = false;
     } else {
-        netDot.className = 'dot offline';
-        netLabel.textContent = 'Offline';
-        brStatus.textContent = 'not connected';
-        brDot.className = 'dot offline';
-        scanBtn.disabled = true;
+        netDot.className = 'dot offline'; netLabel.textContent = 'Offline';
+        brStatus.textContent = 'not connected'; brDot.className = 'dot offline';
     }
 
-    // Populate remediation dropdown
     const select = document.getElementById('remediation-device-select');
     if (select) {
         const curVal = select.value;
@@ -1307,33 +1088,27 @@ function updateConnectTab(data) {
             deviceNodes.map(d => `<option value="${d.device_id}" ${d.device_id===curVal?'selected':''}>${d.display_name} (${d.simulated_ip})</option>`).join('');
     }
 
-    // Discovery list
     const onlineCount = deviceNodes.filter(d => d.online).length;
-    discCount.textContent = `${onlineCount} / ${deviceNodes.length} online`;
+    discCount.textContent = `${onlineCount} / ${deviceNodes.length} Online`;
 
     const list = document.getElementById('device-disc-list');
     if (deviceNodes.length === 0) {
-        list.innerHTML = `<div class="empty-state" style="padding:24px;"><div class="empty-icon">📡</div><div class="empty-desc">Start the network to discover motes</div></div>`;
+        list.innerHTML = `<div style="text-align:center; padding:24px;" class="text-muted text-xs">Start simulator network to discover motes</div>`;
         return;
     }
 
     list.innerHTML = deviceNodes.map(d => `
-        <div class="device-disc-item ${d.online ? 'online' : ''}" onclick="openDeviceModal('${d.device_id}')" style="cursor:pointer;" title="Click to view details">
+        <div class="device-disc-item ${d.online ? 'online' : ''}" onclick="openDeviceModal('${d.device_id}')" style="cursor:pointer;" title="Inspect device">
             <div class="disc-dot"></div>
             <div>
                 <div class="disc-name">${d.display_name}</div>
                 <div class="disc-type">${d.type_label}</div>
             </div>
             <div class="disc-ip font-mono">${d.simulated_ip}</div>
-            <span class="text-xs text-muted" style="margin-left:4px;">🔍</span>
+            <span class="text-xs text-muted">🔍</span>
         </div>
     `).join('');
 }
-
-/* ── Network Map (Radial SVG) ───────────────────────────────────────────── */
-const TYPE_ICONS = {
-    camera: '📷', sensor: '🌡️', router: '📡', smartplug: '🔌'
-};
 
 function updateNetworkMap(groupId, nodes, states) {
     const g = document.getElementById(groupId);
@@ -1350,37 +1125,23 @@ function updateNetworkMap(groupId, nodes, states) {
         const state = states[dev.device_id] || 'pending';
         const icon = TYPE_ICONS[dev.device_type] || '📦';
 
-        let fillColor = 'rgba(26,37,64,0.9)';
-        let strokeColor = 'rgba(58,74,107,0.8)';
+        let fillColor = 'rgba(13, 23, 42, 0.95)';
+        let strokeColor = '#2d4268';
         let glowFilter = '';
-        let pulseClass = '';
 
         if (state === 'scanning') {
-            fillColor = 'rgba(245,158,11,0.15)';
-            strokeColor = 'rgba(245,158,11,0.7)';
-            glowFilter = 'filter:url(#glow-amber)';
-            pulseClass = ' class="scanning-node"';
+            fillColor = 'rgba(245, 158, 11, 0.2)'; strokeColor = '#f59e0b';
         } else if (state === 'cracked') {
-            fillColor = 'rgba(244,63,94,0.2)';
-            strokeColor = 'rgba(244,63,94,0.8)';
-            glowFilter = 'filter:url(#glow-red)';
+            fillColor = 'rgba(244, 63, 94, 0.25)'; strokeColor = '#f43f5e';
         } else if (state === 'safe') {
-            fillColor = 'rgba(16,185,129,0.2)';
-            strokeColor = 'rgba(16,185,129,0.8)';
-            glowFilter = 'filter:url(#glow-green)';
-        } else if (dev.online) {
-            fillColor = 'rgba(79,142,247,0.1)';
-            strokeColor = 'rgba(79,142,247,0.5)';
+            fillColor = 'rgba(16, 185, 129, 0.25)'; strokeColor = '#10b981';
         }
 
-        // Line from center to node
-        html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${strokeColor}" stroke-width="1" stroke-dasharray="${state === 'scanning' ? '4,4' : state === 'pending' ? '3,6' : 'none'}" opacity="0.5"/>`;
-
-        // Node circle with pointer cursor and click handler
-        html += `<g${pulseClass} style="${glowFilter} cursor:pointer;" transform="translate(${x},${y})" onclick="openDeviceModal('${dev.device_id}')">
+        html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${strokeColor}" stroke-width="1.2" stroke-dasharray="${state === 'scanning' ? '4,4' : 'none'}" opacity="0.6"/>`;
+        html += `<g style="${glowFilter} cursor:pointer;" transform="translate(${x},${y})" onclick="openDeviceModal('${dev.device_id}')">
             <circle r="22" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>
             <text y="-3" text-anchor="middle" font-size="12" dominant-baseline="middle">${icon}</text>
-            <text y="11" text-anchor="middle" font-size="6" fill="rgba(232,237,248,0.9)" font-family="Fira Code" font-weight="600">${dev.simulated_ip.replace('fd00::', '::')}</text>
+            <text y="11" text-anchor="middle" font-size="6" fill="#cbd5e1" font-family="JetBrains Mono" font-weight="700">${dev.simulated_ip.replace('fd00::', '::')}</text>
         </g>`;
     });
 
@@ -1388,7 +1149,7 @@ function updateNetworkMap(groupId, nodes, states) {
 }
 
 function setNodeState(deviceId, state) {
-    if (nodeStates[deviceId] === 'cracked' || nodeStates[deviceId] === 'safe') return; // Final states
+    if (nodeStates[deviceId] === 'cracked' || nodeStates[deviceId] === 'safe') return;
     nodeStates[deviceId] = state;
     updateNetworkMap('scan-nodes', deviceNodes, nodeStates);
     updateNodeProgressList();
@@ -1397,31 +1158,25 @@ function setNodeState(deviceId, state) {
 function updateNodeProgressList() {
     const list = document.getElementById('node-progress-list');
     if (deviceNodes.length === 0) {
-        list.innerHTML = '<div class="text-sm text-muted" style="padding:8px;">No scan in progress</div>';
+        list.innerHTML = '<div class="text-sm text-muted" style="padding:8px;">No active audit</div>';
         return;
     }
     list.innerHTML = deviceNodes.map(dev => {
         const state = nodeStates[dev.device_id] || 'pending';
         const icon = TYPE_ICONS[dev.device_type] || '📦';
-        const badge = `<span class="np-badge ${state}">${state}</span>`;
         return `<div class="node-progress-item ${state}">
-            <span class="np-icon">${icon}</span>
+            <span>${icon}</span>
             <span class="np-name">${dev.display_name}</span>
-            <span class="font-mono text-xs" style="color:var(--muted)">${dev.simulated_ip}</span>
-            ${badge}
+            <span class="font-mono text-xs" style="color:var(--text-muted)">${dev.simulated_ip}</span>
+            <span class="np-badge ${state}">${state}</span>
         </div>`;
     }).join('');
 }
 
-/* ── Network Toggle ────────────────────────────────────────────────────────── */
 async function handleNetToggle(forceAction = null) {
     const toggle = document.getElementById('net-toggle');
     let action = forceAction;
-    if (!action) {
-        action = toggle.checked ? 'start' : 'stop';
-    } else {
-        toggle.checked = (action === 'start');
-    }
+    if (!action) { action = toggle.checked ? 'start' : 'stop'; } else { toggle.checked = (action === 'start'); }
 
     try {
         const res  = await fetch('/api/toggle', {
@@ -1433,15 +1188,11 @@ async function handleNetToggle(forceAction = null) {
         networkRunning = data.network_running;
         toggle.checked = networkRunning;
         await checkStatus();
-    } catch (err) {
-        console.error('Toggle failed:', err);
-    }
+    } catch (err) { }
 }
 
-/* ── Launch Scan ─────────────────────────────────────────────────────────── */
 async function launchScan() {
     if (scanRunning) return;
-
     if (!networkRunning) {
         await handleNetToggle('start');
         await new Promise(r => setTimeout(r, 600));
@@ -1451,7 +1202,6 @@ async function launchScan() {
     const maxAttempts = parseInt(document.getElementById('max-attempts-input').value) || null;
     const hardenedOnly = document.getElementById('hardened-only-select').value === 'true';
 
-    // Reset counters and node states
     nodeStates = {};
     Object.assign(nodeStates, Object.fromEntries(deviceNodes.map(d => [d.device_id, 'pending'])));
     document.getElementById('live-cracked').textContent = '0';
@@ -1459,15 +1209,13 @@ async function launchScan() {
     document.getElementById('live-total').textContent   = deviceNodes.length;
     document.getElementById('scan-label-display').textContent = runLabel;
 
-    // Switch to scan tab
     switchTab('scan');
     updateNetworkMap('scan-nodes', deviceNodes, nodeStates);
     updateNodeProgressList();
 
-    // Clear terminal
     const term = document.getElementById('terminal-body');
     term.innerHTML = `<div class="log-line log-head">╔══════════════════════════════════════════════════╗</div>
-<div class="log-line log-head">║     SENTRYMESH CREDENTIAL AUDIT INITIATED        ║</div>
+<div class="log-line log-head">║     SENTRYMESH ENTERPRISE AUDIT INITIATED        ║</div>
 <div class="log-line log-head">╚══════════════════════════════════════════════════╝</div>`;
 
     document.getElementById('btn-launch-scan').disabled = true;
@@ -1479,34 +1227,21 @@ async function launchScan() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ run_label: runLabel, max_attempts: maxAttempts, hardened_only: hardenedOnly })
         });
-
-        if (!res.ok) {
-            const err = await res.json();
-            appendTerminalLine(`[✗] Error: ${err.error}`);
-            return;
-        }
-
+        if (!res.ok) { return; }
         latestResults = await res.json();
-
-        // Update results badge
         const cracked = latestResults.summary?.cracked || 0;
         if (cracked > 0) {
             document.getElementById('results-badge').textContent = cracked;
             document.getElementById('results-badge').classList.add('show');
         }
 
-        // Final node states from results
         (latestResults.devices || []).forEach(dev => {
             setNodeState(dev.device_id, dev.cracked ? 'cracked' : 'safe');
         });
 
-        appendTerminalLine('');
-        appendTerminalLine(`[✓] Audit complete — switch to Results tab to view findings.`);
-
-        // Refresh report tab data
+        appendTerminalLine('\n[✓] Audit complete — view findings in Executive Results.');
         refreshReportView();
     } catch(err) {
-        appendTerminalLine(`[✗] Request failed: ${err.message}`);
     } finally {
         scanRunning = false;
         document.getElementById('btn-launch-scan').disabled = false;
@@ -1514,7 +1249,6 @@ async function launchScan() {
     }
 }
 
-/* ── Load Latest Results ─────────────────────────────────────────────────── */
 async function loadLatestResults() {
     try {
         const res  = await fetch('/api/results');
@@ -1524,12 +1258,9 @@ async function loadLatestResults() {
             refreshResultsView();
             refreshReportView();
         }
-    } catch (err) {
-        console.warn('Failed to load results:', err);
-    }
+    } catch (err) { }
 }
 
-/* ── Results View ────────────────────────────────────────────────────────── */
 function refreshResultsView() {
     if (!latestResults) return;
     const sum = latestResults.summary || {};
@@ -1538,8 +1269,7 @@ function refreshResultsView() {
     document.getElementById('res-total').textContent   = sum.total_devices ?? devs.length;
     document.getElementById('res-cracked').textContent  = sum.cracked ?? 0;
     document.getElementById('res-safe').textContent     = sum.not_cracked ?? 0;
-    document.getElementById('res-vulnrate').textContent =
-        (sum.vulnerability_rate != null ? sum.vulnerability_rate + '%' : '—');
+    document.getElementById('res-vulnrate').textContent = (sum.vulnerability_rate != null ? sum.vulnerability_rate + '%' : '—');
 
     renderResultsTable(devs, latestResults.run_label || 'Scan');
 }
@@ -1549,7 +1279,7 @@ function renderResultsTable(devices, runLabel) {
     const filtered = filterDevices(devices);
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No matching devices</div><div class="empty-desc">Adjust the filter to see results.</div></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:32px;" class="text-muted">No matching devices found</td></tr>`;
         return;
     }
 
@@ -1560,43 +1290,21 @@ function renderResultsTable(devices, runLabel) {
             ? `<span class="cred-chip">${dev.cred}</span>`
             : '<span class="text-muted text-xs">—</span>';
         const icon = TYPE_ICONS[dev.device_type] || '📦';
-        const attempts = dev.all_attempts || [];
-        const sampleAttempts = attempts.slice(0, 8).map(a => {
-            const r = a.result === 'AUTH_OK' ? '✓ 200 OK' : a.result === 'AUTH_FAIL' ? '✗ 401' : a.result;
-            return `${a.username}:${a.password || '(empty)'} → ${r}`;
-        }).join('\n');
 
         return `
-        <tr class="row-main" data-idx="${i}">
-            <td><span class="expand-toggle" onclick="toggleExpand(${i})">▶</span></td>
-            <td><span style="margin-right:6px;">${icon}</span><strong>${dev.name || dev.device_id}</strong></td>
-            <td class="text-muted text-sm">${dev.type || dev.device_type}</td>
-            <td class="font-mono text-xs" style="color:var(--cyan)">${dev.ip || dev.simulated_ip || ''}</td>
+        <tr class="row-main" onclick="openDeviceModal('${dev.device_id || dev.name}')" style="cursor:pointer;">
+            <td>🔍</td>
+            <td><span style="margin-right:8px;">${icon}</span><strong>${dev.name || dev.device_id}</strong></td>
+            <td class="text-muted text-xs">${dev.type || dev.device_type}</td>
+            <td class="font-mono text-xs" style="color:var(--primary); font-weight:600;">${dev.ip || dev.simulated_ip || ''}</td>
             <td class="font-mono text-xs text-muted">${dev.service || 'CoAP/5683'}</td>
             <td>${credHtml}</td>
             <td class="font-mono text-sm">${dev.attempts ?? '—'}</td>
             <td class="font-mono text-sm text-muted">${dev.time || '—'}</td>
             <td><span class="risk-badge ${riskClass}">${dev.risk_level || 'UNKNOWN'}</span></td>
-            <td><span class="run-label-badge">${runLabel}</span></td>
-        </tr>
-        <tr class="row-expand" id="expand-${i}">
-            <td colspan="10">
-                <div class="row-detail" id="detail-${i}">
-                    <div class="attempt-log">${sampleAttempts || 'No attempt data'}</div>
-                    ${dev.rec ? `<div class="alert alert-warn" style="margin-top:8px;">💡 ${dev.rec}</div>` : ''}
-                </div>
-            </td>
+            <td><span class="chip-badge baseline-badge">${runLabel}</span></td>
         </tr>`;
     }).join('');
-}
-
-function toggleExpand(i) {
-    const detail = document.getElementById('detail-' + i);
-    const toggle = document.querySelector(`[data-idx="${i}"] .expand-toggle`);
-    if (!detail) return;
-    const isOpen = detail.classList.contains('open');
-    detail.classList.toggle('open', !isOpen);
-    if (toggle) toggle.textContent = isOpen ? '▶' : '▼';
 }
 
 function filterDevices(devices) {
@@ -1616,7 +1324,6 @@ function setFilter(f) {
     if (latestResults) renderResultsTable(latestResults.devices || [], latestResults.run_label || 'Scan');
 }
 
-/* ── History ─────────────────────────────────────────────────────────────── */
 async function loadHistory() {
     try {
         const res  = await fetch('/api/results/history');
@@ -1624,15 +1331,13 @@ async function loadHistory() {
         scanHistory = data.history || [];
         renderHistoryBar();
         renderBeforeAfterChart();
-    } catch(err) {
-        console.warn('History load failed:', err);
-    }
+    } catch(err) { }
 }
 
 function renderHistoryBar() {
     const bar = document.getElementById('run-history-bar');
     if (scanHistory.length === 0) {
-        bar.innerHTML = '<span class="text-xs text-muted">No scan history yet. Run at least one audit.</span>';
+        bar.innerHTML = '<span class="text-xs text-muted">No audit history yet</span>';
         return;
     }
     bar.innerHTML = scanHistory.map((run, i) => {
@@ -1642,90 +1347,67 @@ function renderHistoryBar() {
         return `<div class="run-chip ${active}" onclick="selectRun('${run.filename}', ${JSON.stringify(run).replace(/"/g,'&quot;')})">
             <span class="chip-badge ${badgeClass}">${isBaseline ? 'B' : 'H'}</span>
             <span>${run.run_label}</span>
-            <span class="text-xs" style="color:var(--muted)">${run.cracked}/${run.total} cracked</span>
+            <span class="text-xs text-muted">${run.cracked}/${run.total} Cracked</span>
         </div>`;
     }).join('');
 }
 
 async function selectRun(filename, runMeta) {
     activeRun = filename;
-    // Load that run's JSON
-    try {
-        const res  = await fetch('/api/results/history');
-        const data = await res.json();
-        // Find by filename — load the archived file content via results endpoint
-        // For simplicity, if it's the latest, use /api/results; otherwise show meta only
-        if (latestResults && latestResults.scan_id === runMeta.scan_id) {
-            refreshResultsView();
-        }
-        renderHistoryBar();
-    } catch(err) { }
+    if (latestResults && latestResults.scan_id === runMeta.scan_id) { refreshResultsView(); }
+    renderHistoryBar();
 }
 
 function renderBeforeAfterChart() {
     const section = document.getElementById('before-after-section');
-    if (scanHistory.length < 1) {
-        section.classList.add('hidden');
-        return;
-    }
+    if (scanHistory.length < 1) { section.classList.add('hidden'); return; }
     section.classList.remove('hidden');
 
-    const labels  = scanHistory.map(r => r.run_label.length > 15 ? r.run_label.slice(0,13)+'…' : r.run_label).reverse();
+    const labels  = scanHistory.map(r => r.run_label).reverse();
     const vulnRates = scanHistory.map(r => r.vuln_rate || 0).reverse();
     const crackedCounts = scanHistory.map(r => r.cracked || 0).reverse();
     const safeCounts    = scanHistory.map(r => (r.total - r.cracked) || 0).reverse();
 
-    // Destroy old charts
     if (beforeAfterChart) { beforeAfterChart.destroy(); beforeAfterChart = null; }
     if (riskDistChart)    { riskDistChart.destroy();    riskDistChart    = null; }
 
     const chartDefaults = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#6b7fa3', font: { family: 'Outfit', size: 11 } } } },
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } } },
         scales: {
-            x: { ticks: { color: '#6b7fa3', font: { family: 'Fira Code', size: 10 } }, grid: { color: 'rgba(26,37,64,0.6)' } },
-            y: { ticks: { color: '#6b7fa3', font: { family: 'Fira Code', size: 10 } }, grid: { color: 'rgba(26,37,64,0.6)' } }
+            x: { ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: 'rgba(27,42,71,0.5)' } },
+            y: { ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: 'rgba(27,42,71,0.5)' } }
         }
     };
 
-    // Before/After bar chart
     const ctx1 = document.getElementById('before-after-chart').getContext('2d');
     beforeAfterChart = new Chart(ctx1, {
         type: 'bar',
         data: {
             labels,
             datasets: [
-                { label: 'Compromised', data: crackedCounts, backgroundColor: 'rgba(244,63,94,0.7)', borderRadius: 5 },
-                { label: 'Protected',   data: safeCounts,   backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 5 }
+                { label: 'Compromised', data: crackedCounts, backgroundColor: 'rgba(244, 63, 94, 0.75)', borderRadius: 6 },
+                { label: 'Protected',   data: safeCounts,   backgroundColor: 'rgba(16, 185, 129, 0.75)', borderRadius: 6 }
             ]
         },
-        options: { ...chartDefaults, plugins: { ...chartDefaults.plugins,
-            title: { display: true, text: 'Vulnerability Rate by Run', color: '#e8edf8', font: { size: 12, family: 'Outfit', weight: '700' } }
-        }, scales: { ...chartDefaults.scales, x: { ...chartDefaults.scales.x, stacked: true }, y: { ...chartDefaults.scales.y, stacked: true } } }
+        options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, title: { display: true, text: 'Vulnerability Posture by Run', color: '#f1f5f9', font: { size: 12, family: 'Outfit', weight: '700' } } } }
     });
 
-    // Vuln rate line
     const ctx2 = document.getElementById('risk-dist-chart').getContext('2d');
     riskDistChart = new Chart(ctx2, {
         type: 'line',
         data: {
             labels,
             datasets: [{
-                label: 'Vulnerability %',
-                data: vulnRates,
-                borderColor: '#f43f5e',
-                backgroundColor: 'rgba(244,63,94,0.1)',
+                label: 'Vulnerability Rate %',
+                data: vulnRates, borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.15)',
                 tension: 0.3, fill: true, pointBackgroundColor: '#f43f5e', pointRadius: 5
             }]
         },
-        options: { ...chartDefaults, plugins: { ...chartDefaults.plugins,
-            title: { display: true, text: 'Vuln Rate Trend', color: '#e8edf8', font: { size: 12, family: 'Outfit', weight: '700' } }
-        }, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 0, max: 100 } } }
+        options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, title: { display: true, text: 'Vulnerability Reduction Trend', color: '#f1f5f9', font: { size: 12, family: 'Outfit', weight: '700' } } }, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 0, max: 100 } } }
     });
 }
 
-/* ── Report View ─────────────────────────────────────────────────────────── */
 function refreshReportView() {
     if (!latestResults) return;
     const sum  = latestResults.summary || {};
@@ -1735,72 +1417,64 @@ function refreshReportView() {
     document.getElementById('rpt-cracked').textContent  = sum.cracked ?? 0;
     document.getElementById('rpt-safe').textContent     = sum.not_cracked ?? 0;
     document.getElementById('rpt-vulnrate').textContent = (sum.vulnerability_rate != null ? sum.vulnerability_rate + '%' : '—');
-
-    // Protocol breakdown
-    const proto = sum.by_protocol || {};
-    const protoHtml = Object.entries(proto).map(([p, v]) => `
-        <div class="device-disc-item">
-            <div class="disc-dot" style="background:${v.cracked > 0 ? 'var(--red)' : 'var(--green)'}"></div>
-            <div class="disc-name">${p}</div>
-            <div class="disc-ip">${v.cracked}/${v.total} cracked</div>
-        </div>`).join('');
-    document.getElementById('proto-breakdown').innerHTML = protoHtml || '<span class="text-muted text-sm">—</span>';
-
-    // Submission checklist
-    const checks = [
-        { ok: devs.length > 0,                       label: 'Scan results available' },
-        { ok: true,                                   label: 'Raw scan log (raw_scan.log)' },
-        { ok: (sum.total_devices || 0) >= 2,          label: 'Multiple devices scanned' },
-        { ok: (sum.cracked || 0) > 0,                 label: 'Credential crack demonstrated' },
-        { ok: (sum.not_cracked || 0) > 0,             label: 'Hardened device tested' },
-    ];
-    document.getElementById('checklist').innerHTML = checks.map(c => `
-        <div class="flex-row gap-8 text-sm" style="padding:6px 0; border-bottom: 1px solid var(--border);">
-            <span style="font-size:1rem">${c.ok ? '✅' : '⬜'}</span>
-            <span style="${c.ok ? '' : 'color:var(--muted)'}">${c.label}</span>
-        </div>`).join('');
 }
 
-/* ── Device Hardening & Remediation UI ────────────────────────────────── */
+async function generateReport() {
+    const btn = document.getElementById('btn-gen-report');
+    btn.disabled = true; btn.textContent = '⏳ Generating...';
+    try {
+        const res  = await fetch('/api/report/html');
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('report-download-link').classList.remove('hidden');
+            btn.textContent = '✅ Report Ready';
+        } else { btn.textContent = '⚡ Generate Report'; btn.disabled = false; }
+    } catch(err) { btn.textContent = '⚡ Generate Report'; btn.disabled = false; }
+}
+
+function downloadJSON() {
+    if (!latestResults) return;
+    const blob = new Blob([JSON.stringify(latestResults, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href  = URL.createObjectURL(blob); a.download = 'scan_results.json'; a.click();
+}
+
 async function applyDevicePasswordChange() {
     const devId = document.getElementById('remediation-device-select').value;
     const pass  = document.getElementById('remediation-pass-input').value.trim();
     const msg   = document.getElementById('remediation-status-msg');
 
-    if (!devId) { alert('Please select a device to harden.'); return; }
-    if (!pass)  { alert('Please enter a new password.'); return; }
+    if (!devId || !pass) { alert('Select a device and enter a password.'); return; }
     if (!networkRunning) { alert('Please start the network first.'); return; }
 
     msg.style.display = 'block';
-    msg.style.background = 'rgba(79,142,247,0.1)';
+    msg.style.background = 'rgba(56, 189, 248, 0.1)';
     msg.style.color = 'var(--primary)';
-    msg.textContent = `⏳ Updating password for ${devId}...`;
+    msg.textContent = `⏳ Hardening ${devId}...`;
 
     try {
         const res = await fetch('/api/change-password', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ device_id: devId, new_password: pass })
         });
-        const data = await res.json();
         if (res.ok) {
-            msg.style.background = 'rgba(16,185,129,0.15)';
-            msg.style.color = 'var(--green)';
-            msg.innerHTML = `✓ ${devId} hardened! Credential set to <code>${pass}</code>.<br><small>Re-auditing network...</small>`;
-
+            msg.style.background = 'rgba(16, 185, 129, 0.18)';
+            msg.style.color = 'var(--status-safe)';
+            msg.innerHTML = `✅ <strong>${devId}</strong> password updated! Starting re-audit in 2s...`;
             document.getElementById('run-label-input').value = 'Post-hardening scan';
-            setTimeout(launchScan, 1200);
+            setTimeout(launchScan, 2000);
         } else {
-            throw new Error(data.error || 'Failed to update credential');
+            msg.style.background = 'rgba(244, 63, 94, 0.18)';
+            msg.style.color = 'var(--status-vuln)';
+            msg.textContent = `❌ Failed to update password for ${devId}. Is the network running?`;
         }
     } catch(err) {
-        msg.style.background = 'rgba(244,63,94,0.15)';
-        msg.style.color = 'var(--red)';
-        msg.textContent = `Error: ${err.message}`;
+        msg.style.background = 'rgba(244, 63, 94, 0.18)';
+        msg.style.color = 'var(--status-vuln)';
+        msg.textContent = `❌ Error: ${err.message}`;
     }
 }
 
-/* ── 1-Click Full Pipeline ─────────────────────────────────────────────── */
 async function runFullPipelineUI() {
     const btn = document.getElementById('btn-quick-pipeline');
     btn.disabled = true;
@@ -1815,61 +1489,62 @@ async function runFullPipelineUI() {
 
         btn.textContent = '⚡ Generating Report...';
         await generateReport();
-    } catch(err) {
-        console.error('Pipeline error:', err);
-    } finally {
-        btn.textContent = '⚡ 1-Click Full Pipeline';
+    } catch(err) { } finally {
+        btn.textContent = '⚡ 1-Click Full Audit';
         btn.disabled = false;
     }
 }
 
-/* ── Inline Report Viewer Modal ────────────────────────────────────────── */
 function toggleInlineReport() {
     const container = document.getElementById('inline-report-container');
     const iframe    = document.getElementById('inline-report-iframe');
     if (!container) return;
 
     const isOpen = !container.classList.contains('hidden');
-    if (isOpen) {
-        container.classList.add('hidden');
-    } else {
+    if (isOpen) { container.classList.add('hidden'); }
+    else {
         container.classList.remove('hidden');
         iframe.src = '/api/report/view?t=' + Date.now();
         container.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
-/* ── Generate Report ─────────────────────────────────────────────────────── */
-async function generateReport() {
-    const btn = document.getElementById('btn-gen-report');
-    btn.disabled = true;
-    btn.textContent = '⏳ Generating...';
-    try {
-        const res  = await fetch('/api/report/html');
-        const data = await res.json();
-        if (data.success) {
-            document.getElementById('report-download-link').classList.remove('hidden');
-            btn.textContent = '✅ Report Ready';
-        } else {
-            btn.textContent = '⚡ Generate Report';
-            btn.disabled = false;
-        }
-    } catch(err) {
-        btn.textContent = '⚡ Generate Report';
-        btn.disabled = false;
+let currentModalDeviceId = null;
+
+// ── Unique per-device password generation ─────────────────────────────────
+const _WORDS = ['Secure','Shield','Vault','Guard','Apex','Nexus','Cipher','Forge','Pulse','Mesh'];
+const _SYMS  = ['#','@','!','$','%'];
+const _devicePassCache = {};
+
+function generateUniquePassword(deviceId) {
+    // Return cached value so the same device always gets the same suggested password
+    // within a session (avoids confusion if user opens modal twice).
+    if (_devicePassCache[deviceId]) return _devicePassCache[deviceId];
+
+    // Deterministic-ish seed from device id characters
+    let seed = 0;
+    for (let i = 0; i < deviceId.length; i++) {
+        seed = (seed * 31 + deviceId.charCodeAt(i)) >>> 0;
     }
+    const rnd = (n) => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed % n; };
+
+    const word1 = _WORDS[rnd(_WORDS.length)];
+    const word2 = _WORDS[rnd(_WORDS.length)];
+    const sym   = _SYMS[rnd(_SYMS.length)];
+    const num   = 1000 + rnd(9000);   // 4-digit number
+    const year  = 2026;
+
+    const pwd = `${word1}${sym}${word2}${num}!${year}`;
+    _devicePassCache[deviceId] = pwd;
+    return pwd;
 }
 
-function downloadJSON() {
-    if (!latestResults) return;
-    const blob = new Blob([JSON.stringify(latestResults, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href  = URL.createObjectURL(blob);
-    a.download = 'scan_results.json';
-    a.click();
+function onSidePanelDeviceSelect(deviceId) {
+    const inp = document.getElementById('remediation-pass-input');
+    if (!inp) return;
+    if (!deviceId) { inp.value = ''; inp.placeholder = 'Select a device to generate password'; return; }
+    inp.value = generateUniquePassword(deviceId);
 }
-/* ── Device Pop-up Modal Logic ─────────────────────────────────────────── */
-let currentModalDeviceId = null;
 
 function openDeviceModal(deviceId) {
     currentModalDeviceId = deviceId;
@@ -1887,7 +1562,7 @@ function openDeviceModal(deviceId) {
     const ip       = devRes?.ip || devCfg.simulated_ip || 'fd00::';
     const port     = devRes?.port || devCfg.port || '';
     const service  = devRes?.service || devCfg.service || 'CoAP/5683';
-    const desc     = devCfg.description || devRes?.banner || 'Contiki-NG virtual mote';
+    const desc     = devCfg.description || devRes?.banner || 'Contiki-NG 6LoWPAN virtual mote';
     const icon     = TYPE_ICONS[devCfg.device_type || ''] || '📦';
     const hardened = devRes ? devRes.hardened : devCfg.hardened;
 
@@ -1903,22 +1578,32 @@ function openDeviceModal(deviceId) {
 
     if (devRes) {
         if (devRes.cracked) {
-            badgeEl.innerHTML = `<span class="risk-badge risk-critical">🔴 EXPLOITED / CRACKED</span>`;
-            credBox.innerHTML = `<span style="color:var(--red)">🔴 Cracked Credential: <code>${devRes.cred || devRes.cracked_credential?.username}</code></span>`;
+            badgeEl.innerHTML = `<span class="risk-badge risk-critical">🔴 VULNERABLE / EXPLOITED</span>`;
+            credBox.innerHTML = `<span style="color:var(--status-vuln)">🔴 Found Credential: <code>${devRes.cred || devRes.cracked_credential?.username}</code></span>`;
         } else {
-            badgeEl.innerHTML = `<span class="risk-badge risk-low">🟢 PROTECTED / SECURE</span>`;
-            credBox.innerHTML = `<span style="color:var(--green)">🟢 Password Hardened & Secure</span>`;
+            badgeEl.innerHTML = `<span class="risk-badge risk-low">🟢 PROTECTED / HARDENED</span>`;
+            credBox.innerHTML = `<span style="color:var(--status-safe)">🟢 Password Enforced & Secure</span>`;
         }
     } else {
-        badgeEl.innerHTML = `<span class="risk-badge risk-unknown">⚪ NOT YET AUDITED</span>`;
-        credBox.innerHTML = `<span class="text-muted">Unaudited</span>`;
+        badgeEl.innerHTML = `<span class="risk-badge risk-medium">⚪ NOT AUDITED</span>`;
+        credBox.innerHTML = `<span class="text-muted">Pending Audit</span>`;
     }
 
     document.getElementById('m-viewport-main').textContent = `${name.toUpperCase()}`;
-    document.getElementById('m-viewport-sub').textContent = `IP: ${ip} · Port ${port} (${service})`;
+    document.getElementById('m-viewport-sub').textContent = `IPv6: ${ip} · Port ${port} (${service})`;
     document.getElementById('m-hud-model').textContent = `TYPE: ${type}`;
     document.getElementById('m-hud-proto').textContent = `SERVICE: ${service}`;
-    document.getElementById('m-hud-hardened').textContent = hardened ? 'DEFENSE: LOCKOUT ENFORCED' : 'DEFENSE: UNHARDENED';
+    document.getElementById('m-hud-hardened').textContent = hardened ? 'DEFENSE: LOCKOUT ACTIVE' : 'DEFENSE: UNHARDENED';
+
+    // Auto-fill unique password for this specific device
+    const passInput = document.getElementById('m-pass-input');
+    if (passInput) passInput.value = generateUniquePassword(deviceId);
+
+    // Also sync the side-panel fields so both stay in-step
+    const sideSel = document.getElementById('remediation-device-select');
+    const sideInp = document.getElementById('remediation-pass-input');
+    if (sideSel) sideSel.value = deviceId;
+    if (sideInp) sideInp.value = generateUniquePassword(deviceId);
 
     modal.classList.remove('hidden');
 }
@@ -1931,7 +1616,7 @@ function closeDeviceModal() {
 async function applyModalPasswordChange() {
     if (!currentModalDeviceId) return;
     const passInput = document.getElementById('m-pass-input').value.trim();
-    if (!passInput) { alert('Enter a valid password'); return; }
+    if (!passInput) return;
 
     const sel = document.getElementById('remediation-device-select');
     if (sel) sel.value = currentModalDeviceId;

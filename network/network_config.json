@@ -8,8 +8,8 @@
     "service": "CoAP/5683",
     "display_name": "TempSensor-01",
     "type_label": "Sensor · Temperature",
-    "description": "Contiki-NG Temperature Sensor — Default Credentials (admin/admin1234)",
-    "valid_credentials": [{"username": "admin", "password": "admin1234"}]
+    "description": "Contiki-NG Temperature Sensor — Default Credentials (user/user)",
+    "valid_credentials": [{"username": "user", "password": "user"}]
   },
   {
     "device_id": "TempSensor-02",
@@ -20,8 +20,8 @@
     "service": "CoAP/5683",
     "display_name": "TempSensor-02",
     "type_label": "Sensor · Temperature",
-    "description": "Contiki-NG Temperature Sensor — Account Lockout (5 fails / 60s)",
-    "valid_credentials": [{"username": "admin", "password": "sensor123"}]
+    "description": "Contiki-NG Temperature Sensor — Hardened (SentryMesh#SensorPass2026!)",
+    "valid_credentials": [{"username": "admin", "password": "SentryMesh#SensorPass2026!"}]
   },
   {
     "device_id": "SmartCamera-03",
@@ -44,8 +44,8 @@
     "service": "CoAP/5683",
     "display_name": "SmartCamera-04",
     "type_label": "Camera · IP Security",
-    "description": "Smart IP Camera (IPCam-2000 HD) — Account Lockout + Hardened",
-    "valid_credentials": [{"username": "admin", "password": "ipcam"}]
+    "description": "Smart IP Camera (IPCam-2000 HD) — Hardened (SentryMesh#CamPass2026!)",
+    "valid_credentials": [{"username": "admin", "password": "SentryMesh#CamPass2026!"}]
   },
   {
     "device_id": "BorderRouter-05",
@@ -68,8 +68,8 @@
     "service": "CoAP/5683",
     "display_name": "BorderRouter-06",
     "type_label": "Router · Border Gateway",
-    "description": "Contiki-NG 6LoWPAN Border Router — SSH-only + Hardened",
-    "valid_credentials": [{"username": "support", "password": "support"}]
+    "description": "Contiki-NG 6LoWPAN Border Router — Hardened (SentryMesh#RouterPass2026!)",
+    "valid_credentials": [{"username": "admin", "password": "SentryMesh#RouterPass2026!"}]
   },
   {
     "device_id": "SmartPlug-07",
@@ -92,7 +92,7 @@
     "service": "CoAP/5683",
     "display_name": "SmartPlug-08",
     "type_label": "SmartPlug · Power Control",
-    "description": "Smart Power Plug — Token-based auth + Hardened",
-    "valid_credentials": [{"username": "admin", "password": "plug123"}]
+    "description": "Smart Power Plug — Hardened (SentryMesh#PlugPass2026!)",
+    "valid_credentials": [{"username": "admin", "password": "SentryMesh#PlugPass2026!"}]
   }
 ]

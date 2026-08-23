@@ -1,7 +1,7 @@
 """
 network/launch_network.py
 =========================
-Launches all 8 simulated IoT device servers.
+Launches all 8 simulated IoT device servers with per-device unique credentials.
 Supports all 4 device types: camera, sensor, router, smartplug.
 """
 
@@ -42,7 +42,8 @@ def launch_all():
         device_id   = item.get("device_id")
         port        = item.get("port")
         hardened    = item.get("hardened", False)
-        host        = "0.0.0.0"  # Listen on all interfaces
+        host        = "0.0.0.0"
+        valid_credentials = item.get("valid_credentials")
 
         cls = DEVICE_CLASS_MAP.get(device_type)
         if cls is None:
@@ -50,12 +51,12 @@ def launch_all():
             continue
 
         try:
-            valid_credentials = item.get("valid_credentials")
             device = cls(device_id, host, port, hardened, valid_credentials=valid_credentials)
             device.start()
             devices.append(device)
             harden_label = "hardened" if hardened else "default creds"
-            print(f"  [+] {device_id:<30} port {port}  [{harden_label}]")
+            cred_str = valid_credentials[0]['password'] if valid_credentials else "default"
+            print(f"  [+] {device_id:<25} port {port}  [{harden_label}]  cred={valid_credentials[0]['username']}:{cred_str}")
         except Exception as e:
             print(f"  [!] Failed to start {device_id} on port {port}: {e}")
 

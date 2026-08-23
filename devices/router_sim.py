@@ -2,7 +2,6 @@
 devices/router_sim.py
 =====================
 Simulates a 6LoWPAN border router with Telnet-like authentication.
-Default credentials: admin/1234 (unhardened).
 """
 
 from .device_base import BaseDevice
@@ -16,9 +15,7 @@ class RouterDevice(BaseDevice):
     def __init__(self, device_id, host, port, hardened, valid_credentials=None):
         if not valid_credentials:
             valid_credentials = [
-                {"username": "admin",  "password": "1234"},
-                {"username": "admin",  "password": "admin"},
-                {"username": "root",   "password": "root"},
+                {"username": "root", "password": "root"},
             ]
         banner = (
             b"\r\nContiki-NG 6LoWPAN Border Router\r\n"
@@ -43,7 +40,6 @@ class RouterDevice(BaseDevice):
         ip = addr[0]
         conn.settimeout(10.0)
         try:
-            # Read username
             username = b""
             while b"\n" not in username:
                 ch = conn.recv(1)
@@ -52,10 +48,8 @@ class RouterDevice(BaseDevice):
                 username += ch
             username = username.decode(errors="ignore").strip()
 
-            # Send password prompt
             conn.sendall(b"Password: ")
 
-            # Read password
             password = b""
             while b"\n" not in password:
                 ch = conn.recv(1)

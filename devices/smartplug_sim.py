@@ -2,7 +2,6 @@
 devices/smartplug_sim.py
 ========================
 Simulates a WiFi smart plug with REST-like authentication.
-Default credentials: admin/password (unhardened).
 """
 
 import json
@@ -17,8 +16,7 @@ class SmartPlugDevice(BaseDevice):
     def __init__(self, device_id, host, port, hardened, valid_credentials=None):
         if not valid_credentials:
             valid_credentials = [
-                {"username": "admin",  "password": "password"},
-                {"username": "admin",  "password": "plug123"},
+                {"username": "admin", "password": "password"},
             ]
         banner = (
             b'POST /api/login HTTP/1.1\r\n'

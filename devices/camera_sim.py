@@ -2,7 +2,7 @@
 devices/camera_sim.py
 =====================
 Simulates an IP camera with HTTP-like authentication.
-Default credentials: admin/admin (unhardened), lockout after 5 fails (hardened).
+Default credentials provided via valid_credentials param or network_config.json.
 """
 
 from .device_base import BaseDevice
@@ -16,8 +16,7 @@ class CameraDevice(BaseDevice):
     def __init__(self, device_id, host, port, hardened, valid_credentials=None):
         if not valid_credentials:
             valid_credentials = [
-                {"username": "admin",  "password": "admin"},
-                {"username": "admin",  "password": "camera1"},
+                {"username": "admin", "password": "admin"},
             ]
         banner = (
             b"HTTP/1.1 401 Unauthorized\r\n"
@@ -50,7 +49,6 @@ class CameraDevice(BaseDevice):
                 data += chunk
 
             line = data.decode(errors="ignore").strip()
-            # Expect: AUTH <user> <pass>
             parts = line.split(" ", 2)
             if len(parts) < 3 or parts[0].upper() != "AUTH":
                 conn.sendall(b"HTTP/1.1 400 Bad Request\r\n\r\n")
