@@ -15,7 +15,7 @@ A lightweight security scanning and simulation toolkit that identifies IoT senso
 - **🎯 Curated Mirai & OWASP Wordlist**: Includes top-50 default username/password pairs ranked by real-world botnet prevalence.
 - **🚀 Multi-Threaded Credential Scanner**: Thread-pool scanner supporting banner fingerprinting, rate limiting, and exponential backoff retry detection.
 - **📊 Quantitative Risk Rubric**: Scores devices from `0` (Lowest Risk) to `10` (Critical Risk) based on credential rank, time-to-crack, and lockout policies.
-- **🎛️ Interactive Wokwi Hardware Simulator UI**: Real-time vector SVG breadboard with ESP32 DevKit, glowing LEDs, pulsing signal wires, and password change remediation forms.
+
 - **📈 Self-Contained HTML/PDF Report Generator**: Generates standalone reports featuring embedded Matplotlib charts (Risk Donut, Protocol Bar, Crack-Time Histogram, Attempts CDF, and Hardening Comparison).
 - **🧪 Unit Test Suite**: Includes automated unit tests verifying device socket response, rate limiting, and credential scanner functions.
 
